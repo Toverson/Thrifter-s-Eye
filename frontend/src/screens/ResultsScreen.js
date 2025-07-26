@@ -1,32 +1,31 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Image,
-} from 'react-native';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function ResultsScreen({ navigation, route }) {
-  const { scanResult, imageUri } = route.params;
+export default function ResultsScreen() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { scanResult, imagePreview } = location.state || {};
+
+  if (!scanResult) {
+    navigate('/');
+    return null;
+  }
 
   const renderConfidenceBar = () => {
     const confidence = scanResult.confidenceScore || 0;
     return (
-      <View style={styles.confidenceContainer}>
-        <Text style={styles.confidenceLabel}>Confidence Score</Text>
-        <View style={styles.confidenceBarContainer}>
-          <View 
-            style={[
-              styles.confidenceBar, 
-              { width: `${confidence}%` }
-            ]} 
-          />
-        </View>
-        <Text style={styles.confidenceText}>{confidence}% confident</Text>
-      </View>
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-semibold text-gray-700">Confidence Score</span>
+          <span className="text-sm text-gray-600">{confidence}% confident</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div 
+            className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-500"
+            style={{ width: `${confidence}%` }}
+          ></div>
+        </div>
+      </div>
     );
   };
 
@@ -36,280 +35,108 @@ export default function ResultsScreen({ navigation, route }) {
     }
 
     return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Similar Listings</Text>
-        {scanResult.similarListings.map((listing, index) => (
-          <View key={index} style={styles.listingCard}>
-            <Text style={styles.listingTitle} numberOfLines={2}>
-              {listing.title}
-            </Text>
-            <Text style={styles.listingSnippet} numberOfLines={2}>
-              {listing.snippet}
-            </Text>
-            {listing.price && (
-              <Text style={styles.listingPrice}>{listing.price}</Text>
-            )}
-          </View>
-        ))}
-      </View>
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h3 className="text-xl font-bold text-gray-800 mb-4">Similar Listings</h3>
+        <div className="space-y-3">
+          {scanResult.similarListings.map((listing, index) => (
+            <div key={index} className="bg-gray-50 rounded-lg p-4 border">
+              <h4 className="font-semibold text-gray-800 text-sm mb-1" style={{ lineHeight: '1.3' }}>
+                {listing.title}
+              </h4>
+              <p className="text-gray-600 text-xs mb-2" style={{ lineHeight: '1.4' }}>
+                {listing.snippet}
+              </p>
+              {listing.link && (
+                <a
+                  href={listing.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                >
+                  View Listing →
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.backButtonText}>← Home</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Scan Results</Text>
-      </View>
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <div className="container mx-auto px-4 py-6">
+          <button
+            onClick={() => navigate('/')}
+            className="text-white hover:text-blue-200 font-semibold mb-4 block"
+          >
+            ← Back to Home
+          </button>
+          <h1 className="text-3xl font-bold mb-2">{scanResult.itemName}</h1>
+          <p className="text-xl text-blue-100">Estimated Value: {scanResult.estimatedValue}</p>
+        </div>
+      </div>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Item header */}
-        <View style={styles.itemHeader}>
-          <Text style={styles.itemName}>{scanResult.itemName}</Text>
-          <Text style={styles.estimatedValue}>{scanResult.estimatedValue}</Text>
-        </View>
+      {/* Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Left Column - Image */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Scanned Image</h3>
+              <img
+                src={imagePreview || `data:image/jpeg;base64,${scanResult.imageBase64}`}
+                alt="Scanned item"
+                className="w-full rounded-lg shadow-md"
+              />
+            </div>
 
-        {/* Image and basic info */}
-        <View style={styles.imageSection}>
-          <Image source={{ uri: imageUri }} style={styles.itemImage} />
-          {renderConfidenceBar()}
-        </View>
+            {renderConfidenceBar()}
+          </div>
 
-        {/* AI Analysis */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>AI Analysis</Text>
-          <View style={styles.analysisCard}>
-            <Text style={styles.analysisText}>{scanResult.aiAnalysis}</Text>
-          </View>
-        </View>
+          {/* Right Column - Analysis */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">AI Analysis</h3>
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <p className="text-gray-800 leading-relaxed">{scanResult.aiAnalysis}</p>
+              </div>
+            </div>
 
-        {/* Listing Draft */}
-        {scanResult.listingDraft && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Suggested Listing</Text>
-            <View style={styles.listingDraftCard}>
-              <Text style={styles.listingDraftTitle}>
-                {scanResult.listingDraft.title}
-              </Text>
-              <Text style={styles.listingDraftDescription}>
-                {scanResult.listingDraft.description}
-              </Text>
-            </View>
-          </View>
-        )}
+            {scanResult.listingDraft && (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Suggested Listing</h3>
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                  <h4 className="font-bold text-green-800 mb-2">{scanResult.listingDraft.title}</h4>
+                  <p className="text-green-700 leading-relaxed">{scanResult.listingDraft.description}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-        {/* Similar Listings */}
+        {/* Similar Listings - Full Width */}
         {renderSimilarListings()}
 
-        {/* Action buttons */}
-        <View style={styles.actionButtons}>
-          <TouchableOpacity 
-            style={styles.scanAgainButton}
-            onPress={() => navigation.navigate('Camera')}
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mt-8">
+          <button
+            onClick={() => navigate('/camera')}
+            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full text-center transition-colors"
           >
-            <Text style={styles.scanAgainText}>📸 Scan Another Item</Text>
-          </TouchableOpacity>
+            📸 Scan Another Item
+          </button>
           
-          <TouchableOpacity 
-            style={styles.historyButton}
-            onPress={() => navigation.navigate('History')}
+          <button
+            onClick={() => navigate('/history')}
+            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full text-center transition-colors"
           >
-            <Text style={styles.historyButtonText}>📋 View History</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            📋 View History
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    padding: 5,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#667eea',
-    fontWeight: '600',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginRight: 50,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  itemHeader: {
-    backgroundColor: '#667eea',
-    paddingHorizontal: 20,
-    paddingVertical: 25,
-    alignItems: 'center',
-  },
-  itemName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  estimatedValue: {
-    fontSize: 20,
-    color: '#f0f0f0',
-    fontWeight: '600',
-  },
-  imageSection: {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  itemImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 15,
-    marginBottom: 20,
-  },
-  confidenceContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  confidenceLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  confidenceBarContainer: {
-    width: '100%',
-    height: 8,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 4,
-    marginBottom: 5,
-  },
-  confidenceBar: {
-    height: '100%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
-  },
-  confidenceText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  section: {
-    backgroundColor: 'white',
-    marginTop: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  analysisCard: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#667eea',
-  },
-  analysisText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#333',
-  },
-  listingDraftCard: {
-    backgroundColor: '#e8f5e8',
-    padding: 15,
-    borderRadius: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
-  },
-  listingDraftTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2d5a2d',
-    marginBottom: 8,
-  },
-  listingDraftDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#4a6741',
-  },
-  listingCard: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  listingTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 5,
-  },
-  listingSnippet: {
-    fontSize: 12,
-    color: '#666',
-    lineHeight: 16,
-    marginBottom: 5,
-  },
-  listingPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-  },
-  actionButtons: {
-    padding: 20,
-    paddingTop: 10,
-  },
-  scanAgainButton: {
-    backgroundColor: '#667eea',
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  scanAgainText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  historyButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#667eea',
-    paddingVertical: 15,
-    borderRadius: 25,
-  },
-  historyButtonText: {
-    color: '#667eea',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-});
