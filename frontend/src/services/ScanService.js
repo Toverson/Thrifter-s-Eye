@@ -5,7 +5,12 @@ export class ScanService {
   static async saveScan(scanData) {
     try {
       const user = auth.currentUser;
-      if (!user) throw new Error('User not authenticated');
+      console.log('🔄 ScanService: saveScan called');
+      console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
 
       const scanWithUser = {
         ...scanData,
@@ -13,10 +18,20 @@ export class ScanService {
         timestamp: serverTimestamp(),
       };
 
+      console.log('🔄 ScanService: Preparing to save scan with userId:', user.uid);
+      console.log('🔄 ScanService: Scan data keys:', Object.keys(scanWithUser));
+
       const docRef = await addDoc(collection(db, 'scans'), scanWithUser);
+      console.log('✅ ScanService: Scan saved successfully with ID:', docRef.id);
+      
       return docRef.id;
     } catch (error) {
-      console.error('Error saving scan:', error);
+      console.error('❌ ScanService: Error saving scan:', error);
+      console.error('❌ ScanService: Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }
