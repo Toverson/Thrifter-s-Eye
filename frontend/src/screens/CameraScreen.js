@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function CameraScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useTheme();
   const { location: userLocation } = location.state || {};
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
