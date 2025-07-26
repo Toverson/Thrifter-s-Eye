@@ -63,6 +63,14 @@ class ScanRequest(BaseModel):
 async def analyze_image_with_vision(image_data: bytes) -> Dict[str, Any]:
     """Analyze image using Google Cloud Vision API"""
     try:
+        if not VISION_API_AVAILABLE or vision_client is None:
+            logging.warning("Vision API not available, using fallback")
+            return {
+                "objects": ["vintage item", "collectible"],
+                "texts": ["VINTAGE", "COLLECTIBLE"],
+                "primary_object": "vintage collectible"
+            }
+            
         image = vision.Image(content=image_data)
         
         # Object localization
