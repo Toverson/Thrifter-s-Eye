@@ -49,6 +49,17 @@ export default function SettingsScreen() {
     }
   };
 
+  const simulateManageSubscriptions = () => {
+    // For web testing, we'll show an informational alert
+    // In the actual iOS app, this would call: Purchases.showManageSubscriptions()
+    alert(
+      'Manage Subscriptions\n\n' +
+      'In the iOS app, this would open your device\'s subscription management screen.\n\n' +
+      'On iOS: Settings → Apple ID → Subscriptions → Thrifter\'s Eye\n\n' +
+      'This allows you to cancel, modify, or view your subscription details.'
+    );
+  };
+
   const simulateRestorePurchases = async () => {
     try {
       setLoading(true);
