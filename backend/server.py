@@ -265,6 +265,10 @@ async def scan_item(request: ScanRequest):
             currency_code=currency_code
         )
         
+        # Store in database
+        await db.scans.insert_one(scan_result.dict())
+        logging.info(f"Scan result stored in database with ID: {scan_result.id}")
+        
         return scan_result
         
     except Exception as e:
