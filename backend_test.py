@@ -292,6 +292,8 @@ Latest scan details:
         except Exception as e:
             self.log_test("backend_logs", "fail", f"Could not check logs: {str(e)}")
             return False
+
+    def test_individual_scan(self):
         """Test 4: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
         try:
             print("\n🔍 Testing Individual Scan Retrieval...")
