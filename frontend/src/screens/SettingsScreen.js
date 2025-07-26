@@ -77,9 +77,9 @@ export default function SettingsScreen() {
   const isAnonymous = user?.isAnonymous;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${theme.colors.backgroundSecondary}`}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className={`${theme.colors.surface} shadow-sm ${theme.colors.border} border-b`}>
         <div className="container mx-auto px-4 py-4 flex items-center">
           <button
             onClick={() => navigate('/')}
@@ -87,31 +87,62 @@ export default function SettingsScreen() {
           >
             ← Back to Home
           </button>
-          <h1 className="flex-1 text-center text-xl font-bold">Settings</h1>
+          <h1 className={`flex-1 text-center text-xl font-bold ${theme.colors.text}`}>Settings</h1>
           <div className="w-20"></div>
         </div>
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8 max-w-2xl">
+        
+        {/* Theme Toggle */}
+        <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-6 border ${theme.colors.border}`}>
+          <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>Appearance</h2>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">{isDark ? '🌙' : '☀️'}</span>
+              <div>
+                <h3 className={`font-semibold ${theme.colors.text}`}>
+                  {isDark ? 'Dark Mode' : 'Light Mode'}
+                </h3>
+                <p className={`${theme.colors.textSecondary} text-sm`}>
+                  Choose your preferred theme
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                isDark ? 'bg-purple-600' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isDark ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
         {/* Account Status */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Account Status</h2>
-          <div className="bg-gray-50 rounded-lg p-4">
+        <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-6 border ${theme.colors.border}`}>
+          <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>Account Status</h2>
+          <div className={`${theme.colors.backgroundTertiary} rounded-lg p-4`}>
             <div className="flex items-center mb-2">
               <span className="text-2xl mr-3">{isAnonymous ? '👤' : '🔐'}</span>
               <div>
-                <h3 className="font-semibold text-gray-800">
+                <h3 className={`font-semibold ${theme.colors.text}`}>
                   {isAnonymous ? 'Anonymous Account' : 'Permanent Account'}
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className={`${theme.colors.textSecondary} text-sm`}>
                   {isAnonymous 
                     ? 'Your data is saved locally but not backed up.'
                     : 'Your account is protected and backed up.'}
                 </p>
               </div>
             </div>
-            <p className="text-xs text-gray-500 font-mono mt-2">
+            <p className={`text-xs ${theme.colors.textMuted} font-mono mt-2`}>
               User ID: {user?.uid?.substr(0, 8)}...
             </p>
           </div>
@@ -119,9 +150,9 @@ export default function SettingsScreen() {
 
         {/* Account Protection */}
         {isAnonymous && (
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Protect Your Scans</h2>
-            <p className="text-gray-600 mb-6">
+          <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-6 border ${theme.colors.border}`}>
+            <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>Protect Your Scans</h2>
+            <p className={`${theme.colors.textSecondary} mb-6`}>
               Create a permanent account to protect your scan history and subscription across devices.
             </p>
             
@@ -129,7 +160,7 @@ export default function SettingsScreen() {
               <button
                 onClick={linkWithEmailPassword}
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
+                className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
               >
                 📧 Link with Email & Password
               </button>
@@ -145,41 +176,55 @@ export default function SettingsScreen() {
           </div>
         )}
 
-        {/* Purchases */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Purchases</h2>
+        {/* Subscription Management */}
+        <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-6 border ${theme.colors.border}`}>
+          <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>Subscription</h2>
           
-          <button
-            onClick={simulateRestorePurchases}
-            disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 mb-3"
-          >
-            🔄 Restore Purchases (Demo)
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={simulateManageSubscriptions}
+              disabled={loading}
+              className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
+            >
+              ⚙️ Manage Subscription
+            </button>
+            
+            <button
+              onClick={simulateRestorePurchases}
+              disabled={loading}
+              className={`w-full ${theme.colors.success} text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
+            >
+              🔄 Restore Purchases (Demo)
+            </button>
+          </div>
           
-          <p className="text-gray-600 text-sm">
-            In the actual iOS app, this would restore your subscription from the App Store via RevenueCat.
+          <p className={`${theme.colors.textSecondary} text-sm mt-4`}>
+            <strong>iOS App Behavior:</strong><br/>
+            • "Manage Subscription" opens your device's Apple ID subscription management<br/>
+            • "Restore Purchases" syncs your subscription status with RevenueCat
           </p>
         </div>
 
         {/* Web Testing Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-bold text-blue-800 mb-3">Web Testing Mode</h2>
-          <div className="space-y-2 text-sm text-blue-700">
+        <div className={`${isDark ? 'bg-blue-900' : 'bg-blue-50'} ${isDark ? 'border-blue-700' : 'border-blue-200'} border rounded-lg p-6 mb-6`}>
+          <h2 className={`text-lg font-bold ${isDark ? 'text-blue-300' : 'text-blue-800'} mb-3`}>Web Testing Mode</h2>
+          <div className={`space-y-2 text-sm ${isDark ? 'text-blue-200' : 'text-blue-700'}`}>
             <p>• Anonymous authentication is working correctly</p>
             <p>• All Firestore operations use your anonymous user ID</p>
             <p>• Account linking simulates the iOS app flow</p>
             <p>• RevenueCat features are simulated for web testing</p>
+            <p>• Theme switching persists across sessions</p>
           </div>
         </div>
 
         {/* App Info */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">App Information</h2>
-          <div className="text-gray-600 space-y-1">
+        <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 border ${theme.colors.border}`}>
+          <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>App Information</h2>
+          <div className={`${theme.colors.textSecondary} space-y-1`}>
             <p>Thrifter's Eye v1.0</p>
             <p>AI-powered item identification</p>
             <p>Web testing version mirroring iOS app</p>
+            <p>Theme: {isDark ? 'Dark Mode' : 'Light Mode'}</p>
           </div>
         </div>
       </div>
