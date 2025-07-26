@@ -16,6 +16,27 @@ import SettingsScreen from './screens/SettingsScreen';
 
 import './App.css';
 
+const AuthRequiredScreen = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <div className={`min-h-screen ${theme.colors.gradient} flex items-center justify-center`}>
+      <div className="text-center">
+        <div className="text-6xl mb-6">🔒</div>
+        <h2 className="text-2xl font-bold text-white mb-4">Authentication Required</h2>
+        <p className="text-blue-100 mb-6">Unable to create anonymous session</p>
+        
+        <button
+          onClick={retryAuth}
+          className="bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 px-6 rounded-full transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
