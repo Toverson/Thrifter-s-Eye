@@ -217,12 +217,22 @@ async def root():
     return {"message": "Thrifter's Eye API - Ready to scan!"}
 
 @api_router.post("/scan", response_model=ScanResult)
-async def scan_item(file: UploadFile = File(...)):
+async def scan_item(request: ScanRequest):
     """Main endpoint for scanning and analyzing items"""
     try:
-        # Read image data
-        image_data = await file.read()
-        image_base64 = base64.b64encode(image_data).decode('utf-8')
+        # Handle both file upload and JSON request formats
+        if hasattr(request, 'imageBase64'):
+            # JSON request format (from web app)
+            image_base64 = request.imageBase64
+            country_code = getattr(request, 'countryCode', 'US')
+            currency_code = getattr(request, 'currencyCode', 'USD')
+            image_data = base64.b64decode(image_base64)
+        else:
+            # File upload format (legacy)
+            image_data = request
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+            country_code = 'US'
+            currency_code = 'USD'
         
         # Step 1: Analyze with Vision API
         logging.info("Analyzing image with Vision API...")
@@ -230,11 +240,11 @@ async def scan_item(file: UploadFile = File(...)):
         
         # Step 2: Search marketplaces
         logging.info("Searching marketplaces...")
-        search_data = await search_marketplaces(vision_data)
+        search_data = await search_marketplaces(vision_data, country_code)
         
-        # Step 3: Analyze with Gemini
+        # Step 3: Analyze with Gemini (update prompt for location-aware analysis)
         logging.info("Analyzing with Gemini AI...")
-        ai_result = await analyze_with_gemini(vision_data, search_data)
+        ai_result = await analyze_with_gemini(vision_data, search_data, country_code, currency_code)
         
         # Create scan result
         scan_result = ScanResult(
@@ -246,17 +256,34 @@ async def scan_item(file: UploadFile = File(...)):
             listing_draft=ai_result.get("listingDraft", {"title": "", "description": ""}),
             similar_listings=search_data.get("similar_listings", []),
             vision_response=vision_data,
-            search_response=search_data.get("raw_response", {})
+            search_response=search_data.get("raw_response", {}),
+            country_code=country_code,
+            currency_code=currency_code
         )
-        
-        # Save to database
-        await db.scans.insert_one(scan_result.dict())
         
         return scan_result
         
     except Exception as e:
         logging.error(f"Scan error: {e}")
         raise HTTPException(status_code=500, detail=f"Scan failed: {str(e)}")
+
+@api_router.post("/scan-file")
+async def scan_item_file(file: UploadFile = File(...)):
+    """File upload endpoint for scanning items"""
+    try:
+        # Read image data
+        image_data = await file.read()
+        
+        # Create a request object and call the main scan function
+        class FileRequest:
+            def __init__(self, data):
+                self.data = data
+        
+        return await scan_item(image_data)
+        
+    except Exception as e:
+        logging.error(f"File scan error: {e}")
+        raise HTTPException(status_code=500, detail=f"File scan failed: {str(e)}")
 
 @api_router.get("/history", response_model=List[ScanResult])
 async def get_scan_history():
