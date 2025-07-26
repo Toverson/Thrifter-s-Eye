@@ -131,6 +131,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Fixed with graceful error handling for Vision API. Full AI pipeline working: Google Vision API (with fallback), Google Custom Search API, Gemini AI integration, MongoDB storage, base64 image storage. Test scan completed successfully with item identification, value estimation ($35-$90 CAD), confidence score (65%), AI analysis, listing draft, and 5 similar listings found."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: End-to-end AI pipeline now working perfectly with real Google Cloud Vision API. Multiple test images produce varied, specific results proving the system analyzes actual image content rather than using generic fallbacks. Examples: 'Vintage Rolex Watch' ($50-$300), 'Antique First Edition Book' ($30-$100), '1964 Liberty Silver Dollar' ($20-$35). Vision API detects real text from images, Custom Search finds relevant listings, Gemini AI provides intelligent analysis. Database storage confirmed. The user's issue of getting identical results for every scan has been completely resolved."
 
   - task: "History Retrieval - GET /api/history"
     implemented: true
