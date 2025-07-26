@@ -54,15 +54,8 @@ export default function HomeScreen({ navigation }) {
     navigation.navigate('History');
   };
 
-  const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', onPress: () => auth().signOut() },
-      ]
-    );
+  const handleSettingsPress = () => {
+    navigation.navigate('Settings');
   };
 
   const getScanCountDisplay = () => {
@@ -79,23 +72,29 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
+        {/* Header with settings */}
         <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logoPlaceholder}>
-              <Text style={styles.logoText}>👁️</Text>
-            </View>
-          </View>
-          <Text style={styles.appName}>Thrifter's Eye</Text>
-          <Text style={styles.tagline}>AI-powered item identification and valuation</Text>
-          
-          {/* Location indicator */}
-          {location && (
-            <Text style={styles.locationText}>
-              📍 {location.countryCode} • Pricing in {location.currencyCode}
-            </Text>
-          )}
+          <View style={styles.headerLeft}></View>
+          <TouchableOpacity style={styles.settingsButton} onPress={handleSettingsPress}>
+            <Text style={styles.settingsText}>⚙️</Text>
+          </TouchableOpacity>
         </View>
+
+        {/* Logo and title */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logoPlaceholder}>
+            <Text style={styles.logoText}>👁️</Text>
+          </View>
+        </View>
+        <Text style={styles.appName}>Thrifter's Eye</Text>
+        <Text style={styles.tagline}>AI-powered item identification and valuation</Text>
+        
+        {/* Location indicator */}
+        {location && (
+          <Text style={styles.locationText}>
+            📍 {location.countryCode} • Pricing in {location.currencyCode}
+          </Text>
+        )}
 
         {/* User status */}
         <View style={styles.statusContainer}>
@@ -118,11 +117,6 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.historyButtonText}>📋 View History</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Sign out button */}
-        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -140,10 +134,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 40,
+  },
+  headerLeft: {
+    width: 40,
+  },
+  settingsButton: {
+    padding: 10,
+  },
+  settingsText: {
+    fontSize: 24,
+    color: 'white',
   },
   logoContainer: {
+    alignItems: 'center',
     marginBottom: 20,
   },
   logoPlaceholder: {
@@ -176,6 +186,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
+    marginBottom: 20,
   },
   statusContainer: {
     marginBottom: 30,
@@ -222,15 +233,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  signOutButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    padding: 10,
-  },
-  signOutText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
   },
 });
