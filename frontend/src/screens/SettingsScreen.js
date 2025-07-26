@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, linkWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 import { UserService } from '../services/UserService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function SettingsScreen() {
   const navigate = useNavigate();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [loading, setLoading] = useState(false);
   const [user] = useState(auth.currentUser);
 
