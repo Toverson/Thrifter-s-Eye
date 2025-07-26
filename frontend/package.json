@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "axios": "^1.8.4",
+    "firebase": "^12.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.7.1",
     "react-scripts": "5.0.1"
   },
   "scripts": {
@@ -17,7 +19,7 @@
   "browserslist": {
     "production": [
       ">0.2%",
-      "not dead",  
+      "not dead",
       "not op_mini all"
     ],
     "development": [
