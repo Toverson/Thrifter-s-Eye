@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { UserService } from '../services/UserService';
 import { LocationService } from '../services/LocationService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function HomeScreen() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [userData, setUserData] = useState(null);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
