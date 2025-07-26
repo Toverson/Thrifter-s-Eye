@@ -355,14 +355,17 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         else:
             self.log_test("scan_endpoint", "skip", "Skipped due to health check failure")
         
-        # Test 3: History Endpoint (only if health check passes)
+        # Test 3: Backend Logs Check
+        logs_ok = self.test_backend_logs()
+        
+        # Test 4: History Endpoint (only if health check passes)
         history_ok = False
         if health_ok:
             history_ok = self.test_history_endpoint()
         else:
             self.log_test("history_endpoint", "skip", "Skipped due to health check failure")
         
-        # Test 4: Individual Scan (only if scan was successful)
+        # Test 5: Individual Scan (only if scan was successful)
         individual_ok = False
         if scan_ok:
             individual_ok = self.test_individual_scan()
