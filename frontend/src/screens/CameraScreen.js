@@ -9,24 +9,63 @@ export default function CameraScreen() {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  const handleFileSelect = (event) => {
+  const compressImage = (file, maxWidth = 1024, quality = 0.8) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        
+        // Set canvas size
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target.result);
-    };
-    reader.readAsDataURL(file);
+    console.log('📸 Original file size:', Math.round(file.size / 1024), 'KB');
 
-    // Convert to base64 for processing
-    const base64Reader = new FileReader();
-    base64Reader.onload = (e) => {
-      const base64 = e.target.result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+    try {
+      // Compress image for mobile optimization
+      const compressedDataUrl = await compressImage(file);
+      console.log('📸 Compressed image size:', Math.round(compressedDataUrl.length / 1024), 'KB');
+      
+      // Set preview
+      setImagePreview(compressedDataUrl);
+      
+      // Extract base64 for processing
+      const base64 = compressedDataUrl.split(',')[1]; // Remove data:image/jpeg;base64, prefix
       setSelectedImage(base64);
-    };
-    base64Reader.readAsDataURL(file);
+      
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      // Fallback to original processing if compression fails
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+        const base64 = e.target.result.split(',')[1];
+        setSelectedImage(base64);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const proceedWithScan = () => {
