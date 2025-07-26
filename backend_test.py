@@ -156,6 +156,18 @@ class ThrifterEyeBackendTester:
                 else:
                     checks.append("❌ No similar listings found")
                 
+                # Verify country/currency awareness
+                if data.get('country_code') == 'CA' and data.get('currency_code') == 'CAD':
+                    checks.append("✅ Country/Currency parameters working correctly")
+                else:
+                    checks.append(f"❌ Country/Currency parameters failed. Got: {data.get('country_code')}/{data.get('currency_code')}")
+                
+                # Check for the specific error that was fixed
+                if 'search_marketplaces() takes 1 positional argument but 2 were given' in str(data):
+                    checks.append("❌ search_marketplaces function signature error still present")
+                else:
+                    checks.append("✅ search_marketplaces function signature fix confirmed")
+                
                 # Store scan ID for later tests
                 self.scan_id = data.get('id')
                 
