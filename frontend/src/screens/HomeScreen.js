@@ -61,7 +61,7 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center">
+      <div className={`min-h-screen ${theme.colors.gradient} flex items-center justify-center`}>
         <div className="text-center">
           <div className="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-white">Loading your account...</p>
