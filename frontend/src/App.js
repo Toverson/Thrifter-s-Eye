@@ -128,17 +128,22 @@ function App() {
   }, [authAttempted]);
 
   const retryAuth = async () => {
+    console.log('🔄 Retrying authentication...');
     setLoading(true);
     setError(null);
     setAuthAttempted(false);
+    setDebugInfo({ step: 'Retrying authentication', timestamp: Date.now() });
     
     try {
-      console.log('Retrying anonymous authentication...');
-      await signInAnonymously(auth);
+      console.log('🚀 Retrying anonymous authentication...');
+      const result = await signInAnonymously(auth);
+      console.log('✅ Retry successful:', result.user.uid);
+      setDebugInfo({ step: 'Retry successful', userId: result.user.uid, timestamp: Date.now() });
     } catch (error) {
-      console.error('Retry failed:', error);
+      console.error('❌ Retry failed:', error);
       setError(`Retry failed: ${error.message}`);
       setLoading(false);
+      setDebugInfo({ step: 'Retry failed', error: error.message, timestamp: Date.now() });
     }
   };
 
