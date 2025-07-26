@@ -212,9 +212,26 @@ function App() {
           </button>
           
           <div className="mt-6 bg-white bg-opacity-10 rounded-lg p-4">
-            <p className="text-blue-100 text-xs">
-              If this persists, check that Anonymous authentication is enabled in Firebase Console
+            <p className="text-blue-100 text-xs mb-2">
+              If this persists, check that Anonymous authentication is enabled in Firebase Console:
             </p>
+            <p className="text-blue-100 text-xs mb-1">
+              1. Go to Firebase Console → Authentication → Sign-in method
+            </p>
+            <p className="text-blue-100 text-xs mb-1">
+              2. Enable "Anonymous" provider
+            </p>
+            <p className="text-blue-100 text-xs">
+              3. Make sure your Firebase project is active
+            </p>
+            
+            {debugInfo.error && (
+              <div className="mt-3 p-2 bg-red-500 bg-opacity-20 rounded">
+                <p className="text-red-200 text-xs">
+                  <strong>Error:</strong> {debugInfo.error}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
