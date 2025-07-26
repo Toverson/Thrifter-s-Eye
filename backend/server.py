@@ -30,8 +30,16 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Google Vision API client
-vision_client = vision.ImageAnnotatorClient()
+# Google Vision API client - with error handling
+try:
+    vision_client = vision.ImageAnnotatorClient()
+    VISION_API_AVAILABLE = True
+    logging.info("Google Vision API client initialized successfully")
+except Exception as e:
+    vision_client = None
+    VISION_API_AVAILABLE = False
+    logging.warning(f"Google Vision API client initialization failed: {e}")
+    logging.warning("Vision API features will be disabled")
 
 # Models
 class ScanResult(BaseModel):
