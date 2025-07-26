@@ -55,6 +55,8 @@ class ScanResult(BaseModel):
     similar_listings: List[Dict[str, Any]]
     vision_response: Optional[Dict[str, Any]] = None
     search_response: Optional[Dict[str, Any]] = None
+    country_code: Optional[str] = "US"
+    currency_code: Optional[str] = "USD"
 
 class ScanRequest(BaseModel):
     imageBase64: str
