@@ -1,356 +1,140 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-  ScrollView,
-} from 'react-native';
-import Purchases from 'react-native-purchases';
-import auth from '@react-native-firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
 import { UserService } from '../services/UserService';
 
-export default function PaywallScreen({ navigation }) {
+export default function PaywallScreen() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const handleUpgrade = async () => {
+    setLoading(true);
+    
+    // For web testing, simulate successful upgrade
     try {
-      setLoading(true);
-      
-      // Get offerings from RevenueCat
-      const offerings = await Purchases.getOfferings();
-      
-      if (offerings.current !== null) {
-        // Find the monthly product
-        const monthlyProduct = offerings.current.monthly;
-        
-        if (monthlyProduct) {
-          // Make the purchase
-          const { customerInfo } = await Purchases.purchaseProduct(monthlyProduct.identifier);
-          
-          // Check if user now has Pro entitlement
-          if (customerInfo.entitlements.active.Pro) {
-            // Update user status in Firestore
-            const user = auth().currentUser;
-            if (user) {
-              await UserService.updateProStatus(user.uid, true);
-            }
-            
-            Alert.alert(
-              'Success!',
-              'Welcome to Thrifter\'s Eye Pro! You now have unlimited scans.',
-              [
-                {
-                  text: 'Start Scanning',
-                  onPress: () => navigation.navigate('Home'),
-                },
-              ]
-            );
-          }
-        }
+      // In the actual React Native app, this would integrate with RevenueCat
+      const user = auth.currentUser;
+      if (user) {
+        await UserService.updateProStatus(user.uid, true);
+        alert('Success! You now have unlimited scans. (This is a web demo - in the real app, this would use RevenueCat for payments)');
+        navigate('/');
       }
     } catch (error) {
-      if (error.userCancelled) {
-        // User cancelled, don't show error
-        return;
-      }
-      
-      console.error('Purchase error:', error);
-      Alert.alert('Error', 'Failed to process purchase. Please try again.');
+      console.error('Upgrade error:', error);
+      alert('Upgrade failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const restorePurchases = async () => {
-    try {
-      setLoading(true);
-      
-      const customerInfo = await Purchases.restorePurchases();
-      
-      if (customerInfo.entitlements.active.Pro) {
-        // Update user status in Firestore
-        const user = auth().currentUser;
-        if (user) {
-          await UserService.updateProStatus(user.uid, true);
-        }
-        
-        Alert.alert(
-          'Restored!',
-          'Your Pro subscription has been restored.',
-          [
-            {
-              text: 'Continue',
-              onPress: () => navigation.navigate('Home'),
-            },
-          ]
-        );
-      } else {
-        Alert.alert('No Purchases', 'No active Pro subscription found.');
-      }
-    } catch (error) {
-      console.error('Restore error:', error);
-      Alert.alert('Error', 'Failed to restore purchases. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const restorePurchases = () => {
+    alert('Restore purchases functionality would be handled by RevenueCat in the native app.');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => navigation.goBack()}
+        <div className="text-center mb-8">
+          <button
+            onClick={() => navigate('/')}
+            className="text-white hover:text-blue-200 font-semibold mb-4 block"
           >
-            <Text style={styles.backButtonText}>← Back</Text>
-          </TouchableOpacity>
-        </View>
+            ← Back to Home
+          </button>
+        </div>
 
         {/* Main content */}
-        <View style={styles.content}>
+        <div className="max-w-2xl mx-auto text-center">
           {/* Logo */}
-          <View style={styles.logoContainer}>
-            <View style={styles.logoPlaceholder}>
-              <Text style={styles.logoText}>👁️</Text>
-            </View>
-            <Text style={styles.proTitle}>Thrifter's Eye Pro</Text>
-          </View>
+          <div className="mb-8">
+            <div className="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
+              <span className="text-4xl">👁️</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">Thrifter's Eye Pro</h1>
+          </div>
 
           {/* Limit message */}
-          <View style={styles.limitMessage}>
-            <Text style={styles.limitTitle}>You've reached your limit</Text>
-            <Text style={styles.limitSubtitle}>
+          <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-white mb-3">You've reached your limit</h2>
+            <p className="text-blue-100 text-lg">
               Free users can scan up to 5 items. Upgrade to Pro for unlimited scanning!
-            </Text>
-          </View>
+            </p>
+          </div>
 
           {/* Benefits */}
-          <View style={styles.benefitsContainer}>
-            <Text style={styles.benefitsTitle}>Pro Benefits</Text>
+          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 mb-8">
+            <h3 className="text-xl font-bold text-white mb-6">Pro Benefits</h3>
             
-            <View style={styles.benefit}>
-              <Text style={styles.benefitIcon}>🔄</Text>
-              <Text style={styles.benefitText}>Unlimited item scans</Text>
-            </View>
-            
-            <View style={styles.benefit}>
-              <Text style={styles.benefitIcon}>🌍</Text>
-              <Text style={styles.benefitText}>Global marketplace pricing</Text>
-            </View>
-            
-            <View style={styles.benefit}>
-              <Text style={styles.benefitIcon}>🎯</Text>
-              <Text style={styles.benefitText}>Enhanced AI accuracy</Text>
-            </View>
-            
-            <View style={styles.benefit}>
-              <Text style={styles.benefitIcon}>📈</Text>
-              <Text style={styles.benefitText}>Detailed market analysis</Text>
-            </View>
-            
-            <View style={styles.benefit}>
-              <Text style={styles.benefitIcon}>⚡</Text>
-              <Text style={styles.benefitText}>Priority processing</Text>
-            </View>
-          </View>
+            <div className="grid gap-4">
+              <div className="flex items-center text-left">
+                <span className="text-2xl mr-4">🔄</span>
+                <div>
+                  <h4 className="font-semibold text-white">Unlimited item scans</h4>
+                  <p className="text-blue-100 text-sm">Scan as many items as you want</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center text-left">
+                <span className="text-2xl mr-4">🌍</span>
+                <div>
+                  <h4 className="font-semibold text-white">Global marketplace pricing</h4>
+                  <p className="text-blue-100 text-sm">Accurate pricing for your location</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center text-left">
+                <span className="text-2xl mr-4">🎯</span>
+                <div>
+                  <h4 className="font-semibold text-white">Enhanced AI accuracy</h4>
+                  <p className="text-blue-100 text-sm">More detailed analysis and insights</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center text-left">
+                <span className="text-2xl mr-4">⚡</span>
+                <div>
+                  <h4 className="font-semibold text-white">Priority processing</h4>
+                  <p className="text-blue-100 text-sm">Faster scan results</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          {/* Pricing */}
-          <View style={styles.pricingContainer}>
-            <Text style={styles.pricingTitle}>Monthly Subscription</Text>
-            <Text style={styles.pricingSubtitle}>Cancel anytime</Text>
-          </View>
+          {/* Pricing notice */}
+          <div className="bg-yellow-500 bg-opacity-20 border border-yellow-400 rounded-lg p-4 mb-8">
+            <h3 className="font-bold text-yellow-100 mb-2">Web Demo Notice</h3>
+            <p className="text-yellow-100 text-sm">
+              This is a web demo. In the actual iOS app, payments are handled securely through RevenueCat and the App Store.
+            </p>
+          </div>
 
           {/* Action buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={[styles.upgradeButton, loading && styles.disabledButton]} 
-              onPress={handleUpgrade}
+          <div className="space-y-4">
+            <button
+              onClick={handleUpgrade}
               disabled={loading}
+              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors disabled:opacity-50"
             >
-              <Text style={styles.upgradeButtonText}>
-                {loading ? 'Processing...' : '⭐ Upgrade to Pro'}
-              </Text>
-            </TouchableOpacity>
+              {loading ? 'Processing...' : '⭐ Upgrade to Pro (Demo)'}
+            </button>
             
-            <TouchableOpacity 
-              style={styles.restoreButton} 
-              onPress={restorePurchases}
-              disabled={loading}
+            <button
+              onClick={restorePurchases}
+              className="w-full bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-full transition-colors hover:bg-white hover:text-purple-600"
             >
-              <Text style={styles.restoreButtonText}>Restore Purchases</Text>
-            </TouchableOpacity>
-          </View>
+              Restore Purchases
+            </button>
+          </div>
 
           {/* Terms */}
-          <View style={styles.termsContainer}>
-            <Text style={styles.termsText}>
-              Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <div className="mt-8">
+            <p className="text-blue-100 text-xs leading-relaxed">
+              In the actual app: Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#667eea',
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  backButton: {
-    padding: 5,
-    alignSelf: 'flex-start',
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 30,
-    alignItems: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginVertical: 30,
-  },
-  logoPlaceholder: {
-    width: 80,
-    height: 80,
-    backgroundColor: 'white',
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  logoText: {
-    fontSize: 40,
-  },
-  proTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  limitMessage: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 30,
-    alignItems: 'center',
-  },
-  limitTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 8,
-  },
-  limitSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  benefitsContainer: {
-    width: '100%',
-    marginBottom: 30,
-  },
-  benefitsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  benefit: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 15,
-    borderRadius: 10,
-  },
-  benefitIcon: {
-    fontSize: 24,
-    marginRight: 15,
-    width: 30,
-  },
-  benefitText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '500',
-  },
-  pricingContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  pricingTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 5,
-  },
-  pricingSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
-  buttonContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  upgradeButton: {
-    backgroundColor: 'white',
-    paddingVertical: 18,
-    borderRadius: 30,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  disabledButton: {
-    opacity: 0.7,
-  },
-  upgradeButtonText: {
-    color: '#667eea',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  restoreButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 15,
-  },
-  restoreButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  termsContainer: {
-    paddingHorizontal: 10,
-  },
-  termsText: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.7)',
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-});
