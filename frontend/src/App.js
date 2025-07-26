@@ -283,13 +283,13 @@ function App() {
     <ThemeProvider>
       <Router>
         <Routes>
-          <Route path="/" element={user ? <HomeScreen /> : <AuthRequiredScreen />} />
-          <Route path="/camera" element={user ? <CameraScreen /> : <AuthRequiredScreen />} />
-          <Route path="/loading" element={user ? <LoadingScreen /> : <AuthRequiredScreen />} />
-          <Route path="/results" element={user ? <ResultsScreen /> : <AuthRequiredScreen />} />
-          <Route path="/history" element={user ? <HistoryScreen /> : <AuthRequiredScreen />} />
-          <Route path="/paywall" element={user ? <PaywallScreen /> : <AuthRequiredScreen />} />
-          <Route path="/settings" element={user ? <SettingsScreen /> : <AuthRequiredScreen />} />
+          <Route path="/" element={user ? <HomeScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
+          <Route path="/camera" element={user ? <CameraScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
+          <Route path="/loading" element={user ? <LoadingScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
+          <Route path="/results" element={user ? <ResultsScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
+          <Route path="/history" element={user ? <HistoryScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
+          <Route path="/paywall" element={user ? <PaywallScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
+          <Route path="/settings" element={user ? <SettingsScreen /> : <AuthRequiredScreen retryAuth={retryAuth} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
