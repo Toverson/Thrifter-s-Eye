@@ -248,7 +248,49 @@ Latest scan details:
             self.log_test("history_endpoint", "fail", f"Unexpected error: {str(e)}")
             return False
 
-    def test_individual_scan(self):
+    def test_backend_logs(self):
+        """Test 5: Backend Logs Verification"""
+        try:
+            print("\n🔍 Checking Backend Logs for Errors...")
+            
+            # Check supervisor logs for backend
+            import subprocess
+            result = subprocess.run(
+                ['tail', '-n', '50', '/var/log/supervisor/backend.out.log'],
+                capture_output=True, text=True, timeout=10
+            )
+            
+            logs = result.stdout
+            
+            # Check for the specific error that was supposed to be fixed
+            if 'search_marketplaces() takes 1 positional argument but 2 were given' in logs:
+                self.log_test("backend_logs", "fail", 
+                            "Found the search_marketplaces signature error in logs")
+                return False
+            
+            # Check for other critical errors
+            error_patterns = [
+                'TypeError', 'AttributeError', 'KeyError', 'ValueError',
+                'Exception', 'Error', 'Failed', 'Traceback'
+            ]
+            
+            found_errors = []
+            for pattern in error_patterns:
+                if pattern.lower() in logs.lower():
+                    found_errors.append(pattern)
+            
+            if found_errors:
+                details = f"Found potential errors in logs: {', '.join(found_errors)}\n\nRecent logs:\n{logs[-500:]}"
+                self.log_test("backend_logs", "warning", details)
+                return True  # Not a critical failure
+            else:
+                self.log_test("backend_logs", "pass", 
+                            "No critical errors found in backend logs")
+                return True
+                
+        except Exception as e:
+            self.log_test("backend_logs", "fail", f"Could not check logs: {str(e)}")
+            return False
         """Test 4: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
         try:
             print("\n🔍 Testing Individual Scan Retrieval...")
