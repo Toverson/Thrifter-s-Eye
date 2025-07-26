@@ -155,14 +155,39 @@ function App() {
           <h2 className="text-2xl font-bold text-white mb-2">Loading Thrifter's Eye...</h2>
           <p className="text-blue-100">Setting up your anonymous session...</p>
           
-          {/* Debug info */}
-          <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 max-w-md mx-auto">
-            <p className="text-blue-100 text-sm">
-              Debug: Auth attempted: {authAttempted ? 'Yes' : 'No'}
+          {/* Enhanced Debug info */}
+          <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 max-w-lg mx-auto text-left">
+            <h3 className="text-white font-semibold mb-2">Debug Information:</h3>
+            <p className="text-blue-100 text-sm mb-1">
+              <strong>Current Step:</strong> {debugInfo.step}
+            </p>
+            <p className="text-blue-100 text-sm mb-1">
+              <strong>Auth Attempted:</strong> {authAttempted ? 'Yes' : 'No'}
+            </p>
+            <p className="text-blue-100 text-sm mb-1">
+              <strong>Current User:</strong> {auth.currentUser ? `${auth.currentUser.uid} (${auth.currentUser.isAnonymous ? 'Anonymous' : 'Authenticated'})` : 'None'}
+            </p>
+            <p className="text-blue-100 text-sm mb-1">
+              <strong>Firebase Connected:</strong> {auth.app ? 'Yes' : 'No'}
             </p>
             <p className="text-blue-100 text-sm">
-              Current user: {auth.currentUser ? 'Found' : 'None'}
+              <strong>Timestamp:</strong> {new Date(debugInfo.timestamp).toLocaleTimeString()}
             </p>
+            {debugInfo.userId && (
+              <p className="text-blue-100 text-sm">
+                <strong>User ID:</strong> {debugInfo.userId.substring(0, 8)}...
+              </p>
+            )}
+          </div>
+          
+          {/* Manual retry button if taking too long */}
+          <div className="mt-6">
+            <button
+              onClick={retryAuth}
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+            >
+              Force Retry
+            </button>
           </div>
         </div>
       </div>
