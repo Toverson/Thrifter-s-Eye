@@ -16,7 +16,7 @@ import SettingsScreen from './screens/SettingsScreen';
 
 import './App.css';
 
-const AuthRequiredScreen = () => {
+const AuthRequiredScreen = ({ retryAuth }) => {
   const { theme } = useTheme();
   
   return (
