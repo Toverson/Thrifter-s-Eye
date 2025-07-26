@@ -1,23 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 import { ScanService } from '../services/ScanService';
 
 export default function HistoryScreen() {
   const navigate = useNavigate();
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    loadScans();
+    // Wait for authentication state to be confirmed
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log('🔄 HistoryScreen: Auth state changed:', currentUser ? currentUser.uid : 'No user');
+      setUser(currentUser);
+      
+      if (currentUser) {
+        loadScans(currentUser);
+      } else {
+        setLoading(false);
+        setScans([]);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const loadScans = async () => {
+  const loadScans = async (currentUser = user) => {
     try {
       setLoading(true);
+      console.log('🔄 HistoryScreen: Loading scans for user:', currentUser?.uid);
+      
+      if (!currentUser) {
+        console.log('❌ HistoryScreen: No authenticated user found');
+        setScans([]);
+        return;
+      }
+
       const userScans = await ScanService.getUserScans(10); // Limit to 10 most recent
+      console.log('✅ HistoryScreen: Loaded', userScans.length, 'scans');
       setScans(userScans);
     } catch (error) {
-      console.error('Error loading scans:', error);
+      console.error('❌ HistoryScreen: Error loading scans:', error);
+      setScans([]);
     } finally {
       setLoading(false);
     }
