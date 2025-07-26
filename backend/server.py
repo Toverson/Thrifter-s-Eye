@@ -143,12 +143,17 @@ async def search_marketplaces(vision_data: Dict[str, Any], country_code: str = "
 async def analyze_with_gemini(vision_data: Dict[str, Any], search_data: Dict[str, Any], country_code: str = "US", currency_code: str = "USD") -> Dict[str, Any]:
     """Analyze with Gemini AI for final appraisal"""
     try:
+        logging.info(f"Starting Gemini analysis for {country_code}/{currency_code}")
+        start_time = time.time()
+        
         # Create Gemini chat instance
         chat = LlmChat(
             api_key=os.environ["GEMINI_API_KEY"],
             session_id=f"scan_{uuid.uuid4()}",
             system_message=f"You are 'Thrifter's Eye,' an expert AI appraiser specializing in items found at thrift stores, garage sales, and flea markets. You are analytical, realistic, and your goal is to help a user understand what they've found and what it might be worth in the {country_code} market (prices in {currency_code})."
         ).with_model("gemini", "gemini-2.0-flash")
+        
+        logging.info("Gemini chat instance created")
         
         # Build prompt with location-aware context
         prompt = f"""
@@ -191,7 +196,11 @@ Your entire response must be a single, valid JSON object. Do not include any tex
 """
 
         user_message = UserMessage(text=prompt)
+        logging.info("Sending message to Gemini API...")
         response = await chat.send_message(user_message)
+        
+        gemini_time = time.time() - start_time
+        logging.info(f"Gemini API response received in {gemini_time:.2f} seconds")
         
         # Parse JSON response
         response_text = response.strip()
@@ -201,6 +210,7 @@ Your entire response must be a single, valid JSON object. Do not include any tex
             response_text = response_text[3:-3]
         
         ai_result = json.loads(response_text)
+        logging.info("Gemini response parsed successfully")
         return ai_result
         
     except Exception as e:
