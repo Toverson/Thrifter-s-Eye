@@ -261,18 +261,16 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<HomeScreen />} />
-            <Route path="/camera" element={<CameraScreen />} />
-            <Route path="/loading" element={<LoadingScreen />} />
-            <Route path="/results" element={<ResultsScreen />} />
-            <Route path="/history" element={<HistoryScreen />} />
-            <Route path="/paywall" element={<PaywallScreen />} />
-            <Route path="/settings" element={<SettingsScreen />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/" element={user ? <HomeScreen /> : <AuthRequiredScreen />} />
+          <Route path="/camera" element={user ? <CameraScreen /> : <AuthRequiredScreen />} />
+          <Route path="/loading" element={user ? <LoadingScreen /> : <AuthRequiredScreen />} />
+          <Route path="/results" element={user ? <ResultsScreen /> : <AuthRequiredScreen />} />
+          <Route path="/history" element={user ? <HistoryScreen /> : <AuthRequiredScreen />} />
+          <Route path="/paywall" element={user ? <PaywallScreen /> : <AuthRequiredScreen />} />
+          <Route path="/settings" element={user ? <SettingsScreen /> : <AuthRequiredScreen />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   );
