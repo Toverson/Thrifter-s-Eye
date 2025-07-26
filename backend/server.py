@@ -57,7 +57,9 @@ class ScanResult(BaseModel):
     search_response: Optional[Dict[str, Any]] = None
 
 class ScanRequest(BaseModel):
-    image_base64: str
+    imageBase64: str
+    countryCode: Optional[str] = "US"
+    currencyCode: Optional[str] = "USD"
 
 # Helper Functions
 async def analyze_image_with_vision(image_data: bytes) -> Dict[str, Any]:
