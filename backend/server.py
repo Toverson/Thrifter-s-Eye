@@ -32,13 +32,14 @@ api_router = APIRouter(prefix="/api")
 
 # Google Vision API client - with error handling
 try:
-    vision_client = vision.ImageAnnotatorClient()
+    # Use Vision API with REST API instead of service account
     VISION_API_AVAILABLE = True
-    logging.info("Google Vision API client initialized successfully")
+    GOOGLE_VISION_API_KEY = os.environ.get("GOOGLE_VISION_API_KEY")
+    logging.info("Google Vision API key configured successfully")
 except Exception as e:
-    vision_client = None
     VISION_API_AVAILABLE = False
-    logging.warning(f"Google Vision API client initialization failed: {e}")
+    GOOGLE_VISION_API_KEY = None
+    logging.warning(f"Google Vision API configuration failed: {e}")
     logging.warning("Vision API features will be disabled")
 
 # Models
@@ -61,9 +62,9 @@ class ScanRequest(BaseModel):
 
 # Helper Functions
 async def analyze_image_with_vision(image_data: bytes) -> Dict[str, Any]:
-    """Analyze image using Google Cloud Vision API"""
+    """Analyze image using Google Cloud Vision API via REST"""
     try:
-        if not VISION_API_AVAILABLE or vision_client is None:
+        if not VISION_API_AVAILABLE or not GOOGLE_VISION_API_KEY:
             logging.warning("Vision API not available, using fallback")
             return {
                 "objects": ["vintage item", "collectible"],
@@ -71,17 +72,46 @@ async def analyze_image_with_vision(image_data: bytes) -> Dict[str, Any]:
                 "primary_object": "vintage collectible"
             }
             
-        image = vision.Image(content=image_data)
+        # Encode image to base64 for REST API
+        image_base64 = base64.b64encode(image_data).decode('utf-8')
         
-        # Object localization
-        objects_response = vision_client.object_localization(image=image)
-        objects = [obj.name for obj in objects_response.localized_object_annotations[:5]]
+        # Vision API REST endpoint
+        vision_url = f"https://vision.googleapis.com/v1/images:annotate?key={GOOGLE_VISION_API_KEY}"
         
-        # Text detection
-        text_response = vision_client.text_detection(image=image)
+        # Request payload for both object localization and text detection
+        payload = {
+            "requests": [
+                {
+                    "image": {
+                        "content": image_base64
+                    },
+                    "features": [
+                        {"type": "OBJECT_LOCALIZATION", "maxResults": 5},
+                        {"type": "TEXT_DETECTION", "maxResults": 3}
+                    ]
+                }
+            ]
+        }
+        
+        # Make REST API call
+        response = requests.post(vision_url, json=payload)
+        response.raise_for_status()
+        vision_result = response.json()
+        
+        # Parse response
+        objects = []
         texts = []
-        if text_response.text_annotations:
-            texts = [text.description for text in text_response.text_annotations[:3]]
+        
+        if "responses" in vision_result and vision_result["responses"]:
+            result = vision_result["responses"][0]
+            
+            # Extract objects
+            if "localizedObjectAnnotations" in result:
+                objects = [obj["name"] for obj in result["localizedObjectAnnotations"][:5]]
+            
+            # Extract texts
+            if "textAnnotations" in result:
+                texts = [text["description"] for text in result["textAnnotations"][:3]]
         
         return {
             "objects": objects,
