@@ -6,13 +6,13 @@ import { LogBox } from 'react-native';
 import Purchases from 'react-native-purchases';
 
 // Screens
-import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import CameraScreen from './src/screens/CameraScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import PaywallScreen from './src/screens/PaywallScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 // Services
 import { UserService } from './src/services/UserService';
@@ -28,45 +28,68 @@ export default function App() {
   // Handle user state changes
   function onAuthStateChanged(user) {
     setUser(user);
+    
+    if (user) {
+      // Initialize RevenueCat with anonymous user ID
+      initializeRevenueCat(user.uid);
+      // Create user document if needed
+      UserService.createUserIfNotExists(user.uid, user.email || 'anonymous@thrifterseye.com');
+    }
+    
     if (initializing) setInitializing(false);
   }
 
-  useEffect(() => {
-    // Initialize RevenueCat
-    Purchases.configure({
-      apiKey: 'appl_MMOvAgIufEcRcRFvFipcmykdqnA',
-    });
+  const initializeRevenueCat = async (userId) => {
+    try {
+      // Configure RevenueCat
+      Purchases.configure({
+        apiKey: 'appl_MMOvAgIufEcRcRFvFipcmykdqnA',
+      });
 
+      // Log in the anonymous user to RevenueCat
+      await Purchases.logIn(userId);
+      console.log('RevenueCat initialized with anonymous user:', userId);
+    } catch (error) {
+      console.error('RevenueCat initialization error:', error);
+    }
+  };
+
+  const signInAnonymously = async () => {
+    try {
+      console.log('Signing in anonymously...');
+      await auth().signInAnonymously();
+    } catch (error) {
+      console.error('Anonymous sign-in error:', error);
+    }
+  };
+
+  useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    
+    // If no user is signed in on startup, sign in anonymously
+    const currentUser = auth().currentUser;
+    if (!currentUser) {
+      signInAnonymously();
+    }
+
     return subscriber; // unsubscribe on unmount
   }, [initializing]);
 
-  useEffect(() => {
-    // Create user document when user signs in
-    if (user) {
-      UserService.createUserIfNotExists(user.uid, user.email);
-    }
-  }, [user]);
-
-  if (initializing) return null; // or loading screen
+  // Show loading screen while initializing
+  if (initializing) {
+    return null; // You could return a loading screen component here
+  }
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
-          // User is signed in
-          <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Camera" component={CameraScreen} />
-            <Stack.Screen name="Loading" component={LoadingScreen} />
-            <Stack.Screen name="Results" component={ResultsScreen} />
-            <Stack.Screen name="History" component={HistoryScreen} />
-            <Stack.Screen name="Paywall" component={PaywallScreen} />
-          </>
-        ) : (
-          // User is not signed in
-          <Stack.Screen name="Login" component={LoginScreen} />
-        )}
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
+        <Stack.Screen name="Loading" component={LoadingScreen} />
+        <Stack.Screen name="Results" component={ResultsScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="Paywall" component={PaywallScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
