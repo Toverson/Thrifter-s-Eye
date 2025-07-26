@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Image,
-  ActivityIndicator,
-} from 'react-native';
-import auth from '@react-native-firebase/auth';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { auth } from '../firebase';
 import { CloudFunctionService } from '../services/CloudFunctionService';
 import { ScanService } from '../services/ScanService';
 import { UserService } from '../services/UserService';
 
-export default function LoadingScreen({ navigation, route }) {
-  const { imageBase64, imageUri, location } = route.params;
+export default function LoadingScreen() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { imageBase64, imagePreview, location: userLocation } = location.state || {};
   const [loadingMessage, setLoadingMessage] = useState('Identifying object...');
 
   const loadingMessages = [
@@ -24,8 +19,13 @@ export default function LoadingScreen({ navigation, route }) {
   ];
 
   useEffect(() => {
+    if (!imageBase64) {
+      navigate('/camera');
+      return;
+    }
+    
     processImage();
-  }, []);
+  }, [imageBase64, navigate]);
 
   useEffect(() => {
     // Cycle through loading messages
@@ -42,17 +42,17 @@ export default function LoadingScreen({ navigation, route }) {
 
   const processImage = async () => {
     try {
-      const user = auth().currentUser;
+      const user = auth.currentUser;
       if (!user) {
-        navigation.navigate('Login');
+        navigate('/login');
         return;
       }
 
       // Call the cloud function to analyze the image
       const result = await CloudFunctionService.scanItem(
         imageBase64,
-        location?.countryCode || 'US',
-        location?.currencyCode || 'USD'
+        userLocation?.countryCode || 'US',
+        userLocation?.currencyCode || 'USD'
       );
 
       // Increment user's scan count (for free users)
@@ -65,111 +65,59 @@ export default function LoadingScreen({ navigation, route }) {
       const scanData = {
         ...result,
         imageBase64,
-        countryCode: location?.countryCode || 'US',
-        currencyCode: location?.currencyCode || 'USD',
+        countryCode: userLocation?.countryCode || 'US',
+        currencyCode: userLocation?.currencyCode || 'USD',
       };
 
       const scanId = await ScanService.saveScan(scanData);
 
       // Navigate to results screen
-      navigation.replace('Results', {
-        scanResult: { ...scanData, id: scanId },
-        imageUri,
+      navigate('/results', {
+        state: {
+          scanResult: { ...scanData, id: scanId },
+          imagePreview,
+        }
       });
 
     } catch (error) {
       console.error('Processing error:', error);
-      // Navigate back with error
-      navigation.goBack();
-      // Could show an error alert here
+      alert('Failed to analyze image. Please try again.');
+      navigate('/camera');
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center p-4">
+      <div className="text-center">
         {/* Show the image being processed */}
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: imageUri }} style={styles.processingImage} />
-        </View>
+        {imagePreview && (
+          <div className="mb-8">
+            <img
+              src={imagePreview}
+              alt="Processing item"
+              className="w-48 h-48 object-cover rounded-lg border-4 border-white shadow-lg mx-auto"
+            />
+          </div>
+        )}
 
         {/* Loading indicator and message */}
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667eea" />
-          <Text style={styles.loadingTitle}>Analyzing Item...</Text>
-          <Text style={styles.loadingMessage}>{loadingMessage}</Text>
-        </View>
+        <div className="mb-8">
+          <div className="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-6"></div>
+          <h2 className="text-3xl font-bold text-white mb-4">Analyzing Item...</h2>
+          <p className="text-xl text-blue-100">{loadingMessage}</p>
+        </div>
 
         {/* Progress indicator */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
-          </View>
-          <Text style={styles.progressText}>This may take 10-30 seconds</Text>
-        </View>
-      </View>
-    </SafeAreaView>
+        <div className="max-w-md mx-auto">
+          <div className="w-full bg-white bg-opacity-30 rounded-full h-2 mb-4">
+            <div 
+              className="bg-white h-2 rounded-full transition-all duration-1000"
+              style={{ width: '70%' }}
+            ></div>
+          </div>
+          <p className="text-blue-100 text-sm">This may take 10-30 seconds</p>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#667eea',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 30,
-  },
-  imageContainer: {
-    marginBottom: 40,
-  },
-  processingImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 15,
-    borderWidth: 3,
-    borderColor: 'white',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  loadingTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  loadingMessage: {
-    fontSize: 18,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-  },
-  progressContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  progressBar: {
-    width: '80%',
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 2,
-    marginBottom: 10,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: 'white',
-    width: '70%',
-    borderRadius: 2,
-  },
-  progressText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-    textAlign: 'center',
-  },
-});
