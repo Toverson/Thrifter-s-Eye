@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { UserService } from '../services/UserService';
 import { LocationService } from '../services/LocationService';
@@ -47,12 +46,6 @@ export default function HomeScreen() {
     navigate('/camera', { state: { location } });
   };
 
-  const handleSignOut = async () => {
-    if (window.confirm('Are you sure you want to sign out?')) {
-      await signOut(auth);
-    }
-  };
-
   const getScanCountDisplay = () => {
     if (!userData) return '';
     
@@ -69,7 +62,7 @@ export default function HomeScreen() {
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white">Loading...</p>
+          <p className="text-white">Loading your account...</p>
         </div>
       </div>
     );
@@ -78,14 +71,15 @@ export default function HomeScreen() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
       <div className="container mx-auto px-4 py-8">
-        {/* Header with sign out */}
+        {/* Header with settings */}
         <div className="flex justify-between items-center mb-8">
           <div></div>
           <button
-            onClick={handleSignOut}
-            className="text-white hover:text-blue-200 text-sm"
+            onClick={() => navigate('/settings')}
+            className="text-white hover:text-blue-200 text-2xl p-2"
+            title="Settings"
           >
-            Sign Out
+            ⚙️
           </button>
         </div>
 
@@ -99,9 +93,14 @@ export default function HomeScreen() {
           <h1 className="text-5xl font-bold text-white mb-4">Thrifter's Eye</h1>
           <p className="text-xl text-blue-100 mb-6">AI-powered item identification and valuation</p>
           
+          {/* Anonymous session indicator */}
+          <div className="inline-block bg-white bg-opacity-20 px-4 py-2 rounded-full mb-4">
+            <span className="text-white text-sm">🔒 Anonymous Session Active</span>
+          </div>
+          
           {/* Location indicator */}
           {location && (
-            <div className="inline-block bg-white bg-opacity-20 px-4 py-2 rounded-full mb-4">
+            <div className="inline-block bg-white bg-opacity-20 px-4 py-2 rounded-full mb-4 ml-2">
               <span className="text-white">📍 {location.countryCode} • Pricing in {location.currencyCode}</span>
             </div>
           )}
@@ -129,6 +128,19 @@ export default function HomeScreen() {
           >
             📋 View History
           </button>
+        </div>
+
+        {/* Web testing info */}
+        <div className="mt-12 max-w-2xl mx-auto">
+          <div className="bg-blue-500 bg-opacity-20 border border-blue-400 rounded-lg p-4">
+            <h3 className="font-bold text-blue-100 mb-2">Web Testing Mode</h3>
+            <p className="text-blue-100 text-sm">
+              You're now using anonymous authentication - the same flow as the iOS app. 
+              Your session ID: <code className="bg-black bg-opacity-20 px-1 rounded text-xs">
+                {auth.currentUser?.uid?.substr(0, 8)}...
+              </code>
+            </p>
+          </div>
         </div>
       </div>
     </div>
