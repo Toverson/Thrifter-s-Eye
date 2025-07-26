@@ -1,70 +1,178 @@
-# Getting Started with Create React App
+# Thrifter's Eye - React Native iOS App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+AI-powered item identification and valuation for thrift store shoppers.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **AI-Powered Scanning**: Uses Google Vision API to identify objects and text from photos
+- **Marketplace Analysis**: Searches eBay, Etsy, and Facebook Marketplace for similar items
+- **Smart Valuation**: Gemini AI provides detailed analysis and pricing estimates
+- **Geolocation-Aware**: Adapts to user's country for relevant pricing in local currency
+- **Freemium Model**: 5 free scans, unlimited with Pro subscription via RevenueCat
+- **User-Specific History**: Stores up to 10 most recent scans per user
+- **Firebase Integration**: Authentication, Firestore database, Cloud Functions
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React Native (iOS)
+- **Backend**: Google Cloud Functions
+- **Database**: Firestore
+- **Authentication**: Firebase Auth (Email/Password, Google Sign-In)
+- **Subscriptions**: RevenueCat
+- **APIs**: Google Vision, Custom Search, Gemini AI
+- **Location**: React Native Geolocation
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Structure
 
-### `npm test`
+```
+ThriftersEyeApp/
+├── src/
+│   ├── screens/           # All app screens
+│   └── services/          # API and data services
+├── functions/             # Google Cloud Functions
+├── ios/                   # iOS-specific files
+├── android/              # Android-specific files (if needed)
+├── assets/               # App assets (icons, images)
+├── App.js                # Main app component
+├── app.json              # Expo configuration
+├── firebase.json         # Firebase configuration
+└── package.json          # Dependencies
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup Instructions
 
-### `npm run build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Xcode** (for iOS development)
+2. **Node.js** (v18 or higher)
+3. **Firebase CLI**: `npm install -g firebase-tools`
+4. **Expo CLI**: `npm install -g @expo/cli`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Firebase Configuration
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Create a Firebase project at https://console.firebase.google.com
+2. Enable Authentication (Email/Password and Google)
+3. Enable Firestore Database
+4. Enable Functions
 
-### `npm run eject`
+### 2. Google APIs Setup
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. **Google Vision API**:
+   - Enable Vision API in Google Cloud Console
+   - Create service account and download JSON key
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. **Google Custom Search API**:
+   - Enable Custom Search API
+   - Create a Custom Search Engine at https://cse.google.com/cse/
+   - Get API key and Search Engine ID
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. **Gemini API**:
+   - Get Gemini API key from Google AI Studio
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 3. RevenueCat Setup
 
-## Learn More
+1. Create RevenueCat account
+2. Set up iOS app and products
+3. Configure entitlements and offerings
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 4. Environment Configuration
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Configure Firebase functions with:
 
-### Code Splitting
+```bash
+firebase functions:config:set google.search_api_key="YOUR_SEARCH_API_KEY"
+firebase functions:config:set google.search_engine_id="YOUR_SEARCH_ENGINE_ID"
+firebase functions:config:set gemini.api_key="YOUR_GEMINI_API_KEY"
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 5. Installation
 
-### Analyzing the Bundle Size
+```bash
+# Install dependencies
+npm install
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# Install iOS dependencies
+cd ios && pod install && cd ..
 
-### Making a Progressive Web App
+# Install function dependencies
+cd functions && npm install && cd ..
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 6. Deployment
 
-### Advanced Configuration
+```bash
+# Deploy Firestore rules and indexes
+firebase deploy --only firestore
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Deploy Cloud Functions
+firebase deploy --only functions
 
-### Deployment
+# Run iOS app
+npm run ios
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Key Features Implementation
 
-### `npm run build` fails to minify
+### Geolocation-Aware Content
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Requests location permission on app startup
+- Determines user's country code and currency
+- Passes location data to AI analysis for region-specific pricing
+
+### Freemium Subscription Model
+
+- Tracks scan count in Firestore user documents
+- Blocks free users after 5 scans
+- RevenueCat integration for Pro subscriptions
+- Unlimited scans for Pro users
+
+### User-Specific Scan History
+
+- Efficient Firestore queries filtered by userId
+- Limited to 10 most recent scans per user
+- Optimized for performance and cost
+
+### AI Analysis Pipeline
+
+1. **Google Vision API**: Object detection and text recognition
+2. **Google Custom Search**: Find similar marketplace listings  
+3. **Gemini AI**: Synthesize data into detailed appraisal
+
+## Configuration Files
+
+- `GoogleService-Info.plist`: iOS Firebase configuration
+- `firestore.rules`: Database security rules
+- `firestore.indexes.json`: Database indexes for optimal performance
+- `app.json`: Expo/React Native configuration
+
+## Production Deployment
+
+1. **iOS App Store**:
+   - Configure app signing in Xcode
+   - Build and upload to App Store Connect
+   - Submit for review
+
+2. **Backend**:
+   - Functions deploy automatically to Firebase
+   - Configure production API keys
+   - Monitor usage and costs
+
+## API Keys Required
+
+- Google Vision API service account JSON
+- Google Custom Search API key + Engine ID  
+- Gemini API key
+- RevenueCat public API key
+- Firebase configuration files
+
+## License
+
+This project is configured for the Thrifter's Eye iOS app.
+
+## Support
+
+For deployment assistance or technical questions, refer to the respective documentation:
+- [Firebase Functions](https://firebase.google.com/docs/functions)
+- [React Native](https://reactnative.dev/docs/getting-started)
+- [RevenueCat](https://docs.revenuecat.com/)
+- [Expo](https://docs.expo.dev/)
