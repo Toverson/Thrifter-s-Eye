@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { auth } from './firebase';
 import { UserService } from './services/UserService';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Import screens
 import HomeScreen from './screens/HomeScreen';
