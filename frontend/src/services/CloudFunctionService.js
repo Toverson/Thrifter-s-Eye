@@ -1,10 +1,12 @@
-// Cloud Function Service for calling the backend
+// Cloud Function Service for calling the backend (simulated for web testing)
 export class CloudFunctionService {
-  static baseUrl = 'https://us-central1-thrifters-eye-app.cloudfunctions.net';
+  // For web testing, we'll use the existing backend API
+  static baseUrl = process.env.REACT_APP_BACKEND_URL;
 
   static async scanItem(imageBase64, countryCode, currencyCode) {
     try {
-      const response = await fetch(`${this.baseUrl}/scanItem`, {
+      // Convert base64 to file for our existing API
+      const response = await fetch(`${this.baseUrl}/api/scan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -20,7 +22,19 @@ export class CloudFunctionService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      
+      // Transform the response to match the expected format
+      return {
+        itemName: data.item_name,
+        estimatedValue: data.estimated_value,
+        confidenceScore: data.confidence_score,
+        aiAnalysis: data.ai_analysis,
+        listingDraft: data.listing_draft,
+        similarListings: data.similar_listings || [],
+        visionResponse: data.vision_response,
+        searchResponse: data.search_response,
+      };
     } catch (error) {
       console.error('Error calling scan function:', error);
       throw error;

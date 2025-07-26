@@ -1,24 +1,19 @@
-import firestore from '@react-native-firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export class UserService {
   static async createUserIfNotExists(userId, email) {
     try {
-      const userDoc = await firestore()
-        .collection('users')
-        .doc(userId)
-        .get();
+      const userDoc = await getDoc(doc(db, 'users', userId));
 
-      if (!userDoc.exists) {
-        await firestore()
-          .collection('users')
-          .doc(userId)
-          .set({
-            userId,
-            email,
-            scanCount: 0,
-            isProSubscriber: false,
-            createdAt: firestore.FieldValue.serverTimestamp(),
-          });
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, 'users', userId), {
+          userId,
+          email,
+          scanCount: 0,
+          isProSubscriber: false,
+          createdAt: serverTimestamp(),
+        });
         console.log('User document created');
       }
     } catch (error) {
@@ -28,12 +23,9 @@ export class UserService {
 
   static async getUserData(userId) {
     try {
-      const userDoc = await firestore()
-        .collection('users')
-        .doc(userId)
-        .get();
+      const userDoc = await getDoc(doc(db, 'users', userId));
 
-      if (userDoc.exists) {
+      if (userDoc.exists()) {
         return userDoc.data();
       }
       return null;
@@ -45,12 +37,9 @@ export class UserService {
 
   static async incrementScanCount(userId) {
     try {
-      await firestore()
-        .collection('users')
-        .doc(userId)
-        .update({
-          scanCount: firestore.FieldValue.increment(1),
-        });
+      await updateDoc(doc(db, 'users', userId), {
+        scanCount: increment(1),
+      });
     } catch (error) {
       console.error('Error incrementing scan count:', error);
     }
@@ -58,12 +47,9 @@ export class UserService {
 
   static async updateProStatus(userId, isProSubscriber) {
     try {
-      await firestore()
-        .collection('users')
-        .doc(userId)
-        .update({
-          isProSubscriber,
-        });
+      await updateDoc(doc(db, 'users', userId), {
+        isProSubscriber,
+      });
     } catch (error) {
       console.error('Error updating pro status:', error);
     }

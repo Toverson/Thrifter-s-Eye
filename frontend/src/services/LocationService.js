@@ -1,26 +1,13 @@
-import Geolocation from 'react-native-geolocation-service';
-import { PermissionsAndroid, Platform } from 'react-native';
-
 export class LocationService {
   static async getCurrentLocation() {
     try {
-      // Request permission
-      if (Platform.OS === 'ios') {
-        const hasPermission = await this.hasLocationPermission();
-        if (!hasPermission) {
-          return this.getDefaultLocation();
-        }
-      } else {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          return this.getDefaultLocation();
-        }
+      // Check if geolocation is supported
+      if (!navigator.geolocation) {
+        return this.getDefaultLocation();
       }
 
       return new Promise((resolve, reject) => {
-        Geolocation.getCurrentPosition(
+        navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
             this.getCountryFromCoordinates(latitude, longitude)
@@ -38,24 +25,6 @@ export class LocationService {
       console.log('Location service error:', error);
       return this.getDefaultLocation();
     }
-  }
-
-  static async hasLocationPermission() {
-    if (Platform.OS === 'ios') {
-      return true; // iOS permissions are handled by the system
-    }
-
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-
-    if (hasPermission) return true;
-
-    const status = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-
-    return status === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   static async getCountryFromCoordinates(latitude, longitude) {
