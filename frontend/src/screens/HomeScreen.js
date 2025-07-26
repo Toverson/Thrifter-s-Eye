@@ -110,8 +110,8 @@ export default function HomeScreen() {
 
         {/* User status */}
         <div className="text-center mb-8">
-          <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto">
-            <p className="text-white font-semibold">{getScanCountDisplay()}</p>
+          <div className={`${theme.colors.surface} ${theme.colors.border} border backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto`}>
+            <p className={`${theme.colors.text} font-semibold`}>{getScanCountDisplay()}</p>
           </div>
         </div>
 
