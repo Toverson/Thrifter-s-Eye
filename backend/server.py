@@ -139,20 +139,20 @@ async def search_marketplaces(vision_data: Dict[str, Any]) -> Dict[str, Any]:
         logging.error(f"Search API error: {e}")
         return {"query": "", "similar_listings": [], "raw_response": {}}
 
-async def analyze_with_gemini(vision_data: Dict[str, Any], search_data: Dict[str, Any]) -> Dict[str, Any]:
+async def analyze_with_gemini(vision_data: Dict[str, Any], search_data: Dict[str, Any], country_code: str = "US", currency_code: str = "USD") -> Dict[str, Any]:
     """Analyze with Gemini AI for final appraisal"""
     try:
         # Create Gemini chat instance
         chat = LlmChat(
             api_key=os.environ["GEMINI_API_KEY"],
             session_id=f"scan_{uuid.uuid4()}",
-            system_message="You are 'Thrifter's Eye,' an expert AI appraiser specializing in items found at thrift stores, garage sales, and flea markets. You are analytical, realistic, and your goal is to help a user understand what they've found and what it might be worth in the Canadian market (prices in CAD)."
+            system_message=f"You are 'Thrifter's Eye,' an expert AI appraiser specializing in items found at thrift stores, garage sales, and flea markets. You are analytical, realistic, and your goal is to help a user understand what they've found and what it might be worth in the {country_code} market (prices in {currency_code})."
         ).with_model("gemini", "gemini-2.0-flash")
         
-        # Build prompt
+        # Build prompt with location-aware context
         prompt = f"""
 # CONTEXT
-You are "Thrifter's Eye," an expert AI appraiser specializing in items found at thrift stores, garage sales, and flea markets. You are analytical, realistic, and your goal is to help a user understand what they've found and what it might be worth in the Canadian market (prices in CAD).
+You are "Thrifter's Eye," an expert AI appraiser specializing in items found at thrift stores, garage sales, and flea markets. You are analytical, realistic, and your goal is to help a user understand what they've found and what it might be worth in the {country_code} market (prices in {currency_code}).
 
 # TASK
 I will provide you with JSON data containing information about an object I scanned. Your task is to analyze this data and return a structured JSON object with your appraisal. You MUST strictly adhere to the requested JSON output format.
@@ -163,15 +163,15 @@ Here is the data I have gathered:
 ## 1. Google Vision AI Analysis:
 {json.dumps(vision_data, indent=2)}
 
-## 2. Similar Listings Found on Canadian Marketplaces:
+## 2. Similar Listings Found on {country_code} Marketplaces:
 {json.dumps(search_data, indent=2)}
 
 # YOUR ANALYSIS & APPRAISAL
 Based on ALL the data above, perform the following actions:
 1. Synthesize the Vision data and Search results to determine the most likely identity of the item.
-2. Analyze the prices of the similar listings, ignoring outliers, to establish a realistic resale value range in Canadian Dollars (CAD).
-3. Write a brief, helpful analysis for the user.
-4. Generate a draft title and description for a marketplace listing.
+2. Analyze the prices of the similar listings, ignoring outliers, to establish a realistic resale value range in {currency_code}.
+3. Write a brief, helpful analysis for the user, considering the {country_code} market conditions.
+4. Generate a draft title and description for a marketplace listing suitable for the {country_code} market.
 5. Provide a confidence score from 0-100 representing your certainty in the valuation.
 
 # REQUIRED OUTPUT FORMAT
@@ -179,12 +179,12 @@ Your entire response must be a single, valid JSON object. Do not include any tex
 
 {{
   "itemName": "A concise and accurate name for the item.",
-  "estimatedValue": "A string representing the value range in CAD, e.g., '$25 - $40 CAD'.",
+  "estimatedValue": "A string representing the value range in {currency_code}, e.g., '$25 - $40 {currency_code}'.",
   "confidenceScore": 75,
-  "aiAnalysis": "A paragraph explaining what the item is, its potential significance or history, and the reasoning behind your valuation. Be realistic about condition and market demand.",
+  "aiAnalysis": "A paragraph explaining what the item is, its potential significance or history, and the reasoning behind your valuation in the {country_code} market. Be realistic about condition and market demand.",
   "listingDraft": {{
-    "title": "A compelling, keyword-rich title for an online marketplace listing.",
-    "description": "A detailed description for the listing, including potential keywords from your analysis."
+    "title": "A compelling, keyword-rich title for an online marketplace listing in {country_code}.",
+    "description": "A detailed description for the listing, including potential keywords from your analysis suitable for {country_code} buyers."
   }}
 }}
 """
@@ -206,12 +206,12 @@ Your entire response must be a single, valid JSON object. Do not include any tex
         logging.error(f"Gemini API error: {e}")
         return {
             "itemName": vision_data.get("primary_object", "Unknown Item"),
-            "estimatedValue": "$10 - $30 CAD",
+            "estimatedValue": f"$10 - $30 {currency_code}",
             "confidenceScore": 25,
-            "aiAnalysis": f"Unable to complete full analysis due to technical issues. Basic identification suggests this is a {vision_data.get('primary_object', 'general item')}. For accurate valuation, please try again or consult with local experts.",
+            "aiAnalysis": f"Unable to complete full analysis due to technical issues. Basic identification suggests this is a {vision_data.get('primary_object', 'general item')}. For accurate valuation in the {country_code} market, please try again or consult with local experts.",
             "listingDraft": {
                 "title": f"{vision_data.get('primary_object', 'Vintage Item')} - Good Condition",
-                "description": "Item found at thrift store, good condition. Please see photos for details."
+                "description": f"Item found at thrift store, good condition. Suitable for {country_code} market. Please see photos for details."
             }
         }
 
