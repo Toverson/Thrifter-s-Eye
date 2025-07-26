@@ -24,57 +24,105 @@ function App() {
 
   useEffect(() => {
     let mounted = true;
+    let authTimeout;
+
+    console.log('🔧 Auth useEffect starting...');
+    setDebugInfo({ step: 'Setting up auth listener', timestamp: Date.now() });
+
+    // Set up a timeout to prevent infinite loading
+    const setupAuthTimeout = () => {
+      authTimeout = setTimeout(() => {
+        if (mounted && loading) {
+          console.error('❌ Authentication timeout reached after 15 seconds');
+          setError('Authentication timeout - please check your internet connection and try again');
+          setLoading(false);
+          setDebugInfo({ step: 'Timeout reached', timestamp: Date.now() });
+        }
+      }, 15000); // 15 second timeout
+    };
+
+    setupAuthTimeout();
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed:', user ? `User signed in: ${user.uid}` : 'No user');
+      console.log('🔄 Auth state changed:', user ? `User signed in: ${user.uid}` : 'No user');
+      setDebugInfo({ step: 'Auth state changed', user: user ? user.uid : 'none', timestamp: Date.now() });
+      
+      // Clear the timeout since we got a state change
+      if (authTimeout) {
+        clearTimeout(authTimeout);
+      }
       
       if (user) {
-        console.log('User details:', {
+        console.log('✅ User details:', {
           uid: user.uid,
           isAnonymous: user.isAnonymous,
           email: user.email
         });
         
+        setDebugInfo({ step: 'Creating user document', userId: user.uid, timestamp: Date.now() });
+        
         try {
           // Create user document if it doesn't exist
+          console.log('📝 Creating user document for:', user.uid);
           await UserService.createUserIfNotExists(user.uid, user.email || 'anonymous@thrifterseye.com');
+          console.log('✅ User document created/verified');
+          
           if (mounted) {
             setUser(user);
             setError(null);
             setLoading(false);
+            setDebugInfo({ step: 'Authentication complete', userId: user.uid, timestamp: Date.now() });
           }
         } catch (error) {
-          console.error('Error creating user document:', error);
+          console.error('❌ Error creating user document:', error);
           if (mounted) {
-            setError('Failed to initialize user data');
+            setError(`Failed to initialize user data: ${error.message}`);
             setLoading(false);
+            setDebugInfo({ step: 'User document creation failed', error: error.message, timestamp: Date.now() });
           }
         }
       } else if (!authAttempted) {
         // No user signed in, try to sign in anonymously
-        console.log('No user found, attempting anonymous sign-in...');
+        console.log('🔐 No user found, attempting anonymous sign-in...');
+        setDebugInfo({ step: 'Attempting anonymous sign-in', timestamp: Date.now() });
         setAuthAttempted(true);
         
         try {
-          await signInAnonymously(auth);
-          console.log('Anonymous sign-in initiated');
+          console.log('🚀 Initiating anonymous sign-in...');
+          const result = await signInAnonymously(auth);
+          console.log('✅ Anonymous sign-in successful:', result.user.uid);
+          setDebugInfo({ step: 'Anonymous sign-in successful', userId: result.user.uid, timestamp: Date.now() });
         } catch (error) {
-          console.error('Anonymous sign-in failed:', error);
+          console.error('❌ Anonymous sign-in failed:', error);
+          console.error('Error code:', error.code);
+          console.error('Error message:', error.message);
+          
           if (mounted) {
             setError(`Authentication failed: ${error.message}`);
             setLoading(false);
+            setDebugInfo({ step: 'Anonymous sign-in failed', error: error.message, timestamp: Date.now() });
           }
         }
       } else {
         // Authentication was attempted but failed
+        console.log('⚠️ Authentication was attempted but no user found');
         if (mounted) {
           setLoading(false);
+          setDebugInfo({ step: 'Authentication failed - no user', timestamp: Date.now() });
         }
       }
     });
 
+    // Test Firebase connection
+    console.log('🔧 Firebase auth instance:', auth);
+    console.log('🔧 Firebase config:', auth.app.options);
+
     return () => {
+      console.log('🧹 Cleaning up auth effect...');
       mounted = false;
+      if (authTimeout) {
+        clearTimeout(authTimeout);
+      }
       unsubscribe();
     };
   }, [authAttempted]);
