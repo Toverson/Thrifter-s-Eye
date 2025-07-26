@@ -74,24 +74,38 @@ class ThrifterEyeBackendTester:
             return False
 
     def test_scan_endpoint(self):
-        """Test 2: File Upload and Full AI Pipeline - POST /api/scan"""
+        """Test 2: JSON-based Scan Endpoint with Full AI Pipeline - POST /api/scan"""
         try:
-            print("\n🔍 Testing Scan Endpoint with AI Pipeline...")
+            print("\n🔍 Testing JSON-based Scan Endpoint with AI Pipeline...")
             
-            # Load test image
+            # Load test image and convert to base64
             test_image_path = "/app/test_item.jpg"
             if not os.path.exists(test_image_path):
                 self.log_test("scan_endpoint", "fail", "Test image not found")
                 return False
             
-            # Prepare multipart file upload
+            # Convert image to base64
             with open(test_image_path, 'rb') as f:
-                files = {'file': ('test_item.jpg', f, 'image/jpeg')}
-                
-                print("Uploading image and processing with AI pipeline...")
-                print("This may take 10-30 seconds due to AI processing...")
-                
-                response = requests.post(f"{API_BASE}/scan", files=files, timeout=60)
+                image_data = f.read()
+                image_base64 = base64.b64encode(image_data).decode('utf-8')
+            
+            # Prepare JSON payload as expected by frontend
+            payload = {
+                "imageBase64": image_base64,
+                "countryCode": "CA",  # Test with Canada to verify country_code parameter
+                "currencyCode": "CAD"
+            }
+            
+            print("Sending JSON request with base64 image and processing with AI pipeline...")
+            print("This may take 10-30 seconds due to AI processing...")
+            print(f"Testing with country: {payload['countryCode']}, currency: {payload['currencyCode']}")
+            
+            response = requests.post(
+                f"{API_BASE}/scan", 
+                json=payload,
+                headers={'Content-Type': 'application/json'},
+                timeout=60
+            )
             
             if response.status_code == 200:
                 data = response.json()
