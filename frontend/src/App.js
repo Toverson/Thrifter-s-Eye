@@ -20,6 +20,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [authAttempted, setAuthAttempted] = useState(false);
+  const [debugInfo, setDebugInfo] = useState({ step: 'Initializing', timestamp: Date.now() });
 
   useEffect(() => {
     let mounted = true;
