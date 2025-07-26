@@ -1,138 +1,119 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { UserService } from '../services/UserService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function PaywallScreen() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
 
-  const handleUpgrade = async () => {
-    setLoading(true);
-    
-    // For web testing, simulate successful upgrade
+  const simulateProUpgrade = async () => {
     try {
-      // In the actual React Native app, this would integrate with RevenueCat
       const user = auth.currentUser;
       if (user) {
         await UserService.updateProStatus(user.uid, true);
-        alert('Success! You now have unlimited scans. (This is a web demo - in the real app, this would use RevenueCat for payments)');
+        alert('Pro upgrade successful! (This is a web demo - in the real app, this would use RevenueCat)');
         navigate('/');
       }
     } catch (error) {
-      console.error('Upgrade error:', error);
-      alert('Upgrade failed. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error('Pro upgrade error:', error);
+      alert('Failed to upgrade to Pro. Please try again.');
     }
   };
 
-  const restorePurchases = () => {
-    alert('Restore purchases functionality would be handled by RevenueCat in the native app.');
-  };
+  const features = [
+    '📷 Unlimited item scans',
+    '💎 Premium AI analysis',
+    '📊 Advanced market insights',
+    '🏷️ Detailed listing recommendations',
+    '📈 Price history tracking',
+    '🔄 Scan history backup',
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
+    <div className={`min-h-screen ${theme.colors.backgroundSecondary}`}>
+      {/* Header */}
+      <div className={`${theme.colors.surface} shadow-sm ${theme.colors.border} border-b`}>
+        <div className="container mx-auto px-4 py-4 flex items-center">
           <button
             onClick={() => navigate('/')}
-            className="text-white hover:text-blue-200 font-semibold mb-4 block"
+            className="text-purple-600 hover:text-purple-800 font-semibold"
           >
             ← Back to Home
           </button>
+          <h1 className={`flex-1 text-center text-xl font-bold ${theme.colors.text}`}>Upgrade to Pro</h1>
+          <div className="w-20"></div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="text-6xl mb-6">💎</div>
+          <h2 className={`text-4xl font-bold ${theme.colors.text} mb-4`}>
+            Unlock Pro Features
+          </h2>
+          <p className={`text-xl ${theme.colors.textSecondary} mb-8`}>
+            You've used all 5 free scans. Upgrade to Pro for unlimited access and premium features.
+          </p>
         </div>
 
-        {/* Main content */}
-        <div className="max-w-2xl mx-auto text-center">
-          {/* Logo */}
-          <div className="mb-8">
-            <div className="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
-              <span className="text-4xl">👁️</span>
+        {/* Pricing Card */}
+        <div className={`${theme.colors.surface} rounded-lg shadow-xl p-8 mb-8 ${theme.colors.border} border`}>
+          <div className="text-center mb-8">
+            <h3 className={`text-2xl font-bold ${theme.colors.text} mb-2`}>Thrifter's Eye Pro</h3>
+            <div className="flex items-baseline justify-center">
+              <span className="text-4xl font-bold text-green-600">$4.99</span>
+              <span className={`text-lg ${theme.colors.textSecondary} ml-2`}>/month</span>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Thrifter's Eye Pro</h1>
+            <p className={`text-sm ${theme.colors.textMuted} mt-2`}>Cancel anytime</p>
           </div>
 
-          {/* Limit message */}
-          <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-white mb-3">You've reached your limit</h2>
-            <p className="text-blue-100 text-lg">
-              Free users can scan up to 5 items. Upgrade to Pro for unlimited scanning!
-            </p>
-          </div>
-
-          {/* Benefits */}
-          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 mb-8">
-            <h3 className="text-xl font-bold text-white mb-6">Pro Benefits</h3>
-            
-            <div className="grid gap-4">
-              <div className="flex items-center text-left">
-                <span className="text-2xl mr-4">🔄</span>
-                <div>
-                  <h4 className="font-semibold text-white">Unlimited item scans</h4>
-                  <p className="text-blue-100 text-sm">Scan as many items as you want</p>
+          {/* Features List */}
+          <div className="space-y-4 mb-8">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
+                <span className={theme.colors.text}>{feature}</span>
               </div>
-              
-              <div className="flex items-center text-left">
-                <span className="text-2xl mr-4">🌍</span>
-                <div>
-                  <h4 className="font-semibold text-white">Global marketplace pricing</h4>
-                  <p className="text-blue-100 text-sm">Accurate pricing for your location</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center text-left">
-                <span className="text-2xl mr-4">🎯</span>
-                <div>
-                  <h4 className="font-semibold text-white">Enhanced AI accuracy</h4>
-                  <p className="text-blue-100 text-sm">More detailed analysis and insights</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center text-left">
-                <span className="text-2xl mr-4">⚡</span>
-                <div>
-                  <h4 className="font-semibold text-white">Priority processing</h4>
-                  <p className="text-blue-100 text-sm">Faster scan results</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Pricing notice */}
-          <div className="bg-yellow-500 bg-opacity-20 border border-yellow-400 rounded-lg p-4 mb-8">
-            <h3 className="font-bold text-yellow-100 mb-2">Web Demo Notice</h3>
-            <p className="text-yellow-100 text-sm">
-              This is a web demo. In the actual iOS app, payments are handled securely through RevenueCat and the App Store.
-            </p>
-          </div>
+          {/* Upgrade Button */}
+          <button
+            onClick={simulateProUpgrade}
+            className={`w-full ${theme.colors.success} text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl`}
+          >
+            🚀 Upgrade to Pro Now
+          </button>
 
-          {/* Action buttons */}
-          <div className="space-y-4">
-            <button
-              onClick={handleUpgrade}
-              disabled={loading}
-              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Processing...' : '⭐ Upgrade to Pro (Demo)'}
-            </button>
-            
-            <button
-              onClick={restorePurchases}
-              className="w-full bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-full transition-colors hover:bg-white hover:text-purple-600"
-            >
-              Restore Purchases
-            </button>
-          </div>
+          <p className={`text-xs ${theme.colors.textMuted} text-center mt-4`}>
+            In the actual iOS app, this would integrate with RevenueCat for subscription management
+          </p>
+        </div>
 
-          {/* Terms */}
-          <div className="mt-8">
-            <p className="text-blue-100 text-xs leading-relaxed">
-              In the actual app: Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.
-            </p>
+        {/* Value Proposition */}
+        <div className={`${theme.colors.surface} rounded-lg p-6 ${theme.colors.border} border`}>
+          <h4 className={`font-bold ${theme.colors.text} mb-3`}>Why Upgrade?</h4>
+          <div className={`space-y-2 text-sm ${theme.colors.textSecondary}`}>
+            <p>• <strong>Save Money:</strong> Find valuable items others miss</p>
+            <p>• <strong>Make Money:</strong> Price items correctly for maximum profit</p>
+            <p>• <strong>Save Time:</strong> Instant AI-powered identification and valuation</p>
+            <p>• <strong>Stay Ahead:</strong> Advanced market insights keep you competitive</p>
           </div>
+        </div>
+
+        {/* Free Trial Info */}
+        <div className="text-center mt-8">
+          <p className={`text-sm ${theme.colors.textMuted}`}>
+            Your free trial included 5 scans. Upgrade now to continue discovering hidden treasures!
+          </p>
         </div>
       </div>
     </div>

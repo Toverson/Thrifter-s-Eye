@@ -1,141 +1,184 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function ResultsScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useTheme();
   const { scanResult, imagePreview } = location.state || {};
+  const [showFullAnalysis, setShowFullAnalysis] = useState(false);
 
   if (!scanResult) {
-    navigate('/');
-    return null;
+    return (
+      <div className={`min-h-screen ${theme.colors.backgroundSecondary} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <h2 className={`text-2xl font-bold ${theme.colors.text} mb-4`}>No Results Found</h2>
+          <p className={`${theme.colors.textSecondary} mb-6`}>
+            Something went wrong. Please try scanning again.
+          </p>
+          <button
+            onClick={() => navigate('/camera')}
+            className={`${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-full transition-colors`}
+          >
+            📸 Scan Again
+          </button>
+        </div>
+      </div>
+    );
   }
 
-  const renderConfidenceBar = () => {
-    const confidence = scanResult.confidenceScore || 0;
-    return (
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-semibold text-gray-700">Confidence Score</span>
-          <span className="text-sm text-gray-600">{confidence}% confident</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div 
-            className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-500"
-            style={{ width: `${confidence}%` }}
-          ></div>
-        </div>
-      </div>
-    );
-  };
+  const confidenceColor = scanResult.confidenceScore >= 70 
+    ? 'text-green-600' 
+    : scanResult.confidenceScore >= 40 
+    ? 'text-yellow-600' 
+    : 'text-red-600';
 
-  const renderSimilarListings = () => {
-    if (!scanResult.similarListings || scanResult.similarListings.length === 0) {
-      return null;
-    }
-
-    return (
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Similar Listings</h3>
-        <div className="space-y-3">
-          {scanResult.similarListings.map((listing, index) => (
-            <div key={index} className="bg-gray-50 rounded-lg p-4 border">
-              <h4 className="font-semibold text-gray-800 text-sm mb-1" style={{ lineHeight: '1.3' }}>
-                {listing.title}
-              </h4>
-              <p className="text-gray-600 text-xs mb-2" style={{ lineHeight: '1.4' }}>
-                {listing.snippet}
-              </p>
-              {listing.link && (
-                <a
-                  href={listing.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                >
-                  View Listing →
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const confidenceText = scanResult.confidenceScore >= 70 
+    ? 'High Confidence' 
+    : scanResult.confidenceScore >= 40 
+    ? 'Medium Confidence' 
+    : 'Low Confidence';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${theme.colors.backgroundSecondary}`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-        <div className="container mx-auto px-4 py-6">
+      <div className={`${theme.colors.surface} shadow-sm ${theme.colors.border} border-b`}>
+        <div className="container mx-auto px-4 py-4 flex items-center">
           <button
             onClick={() => navigate('/')}
-            className="text-white hover:text-blue-200 font-semibold mb-4 block"
+            className="text-purple-600 hover:text-purple-800 font-semibold"
           >
             ← Back to Home
           </button>
-          <h1 className="text-3xl font-bold mb-2">{scanResult.itemName}</h1>
-          <p className="text-xl text-blue-100">Estimated Value: {scanResult.estimatedValue}</p>
+          <h1 className={`flex-1 text-center text-xl font-bold ${theme.colors.text}`}>Scan Results</h1>
+          <div className="w-20"></div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Image */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Scanned Image</h3>
-              <img
-                src={imagePreview || `data:image/jpeg;base64,${scanResult.imageBase64}`}
-                alt="Scanned item"
-                className="w-full rounded-lg shadow-md"
-              />
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Image and Basic Info */}
+        <div className={`${theme.colors.surface} rounded-lg shadow-lg overflow-hidden mb-8 ${theme.colors.border} border`}>
+          <div className="md:flex">
+            <div className="md:w-1/2">
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt={scanResult.itemName}
+                  className="w-full h-80 md:h-full object-cover"
+                />
+              )}
             </div>
-
-            {renderConfidenceBar()}
-          </div>
-
-          {/* Right Column - Analysis */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">AI Analysis</h3>
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                <p className="text-gray-800 leading-relaxed">{scanResult.aiAnalysis}</p>
-              </div>
-            </div>
-
-            {scanResult.listingDraft && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Suggested Listing</h3>
-                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
-                  <h4 className="font-bold text-green-800 mb-2">{scanResult.listingDraft.title}</h4>
-                  <p className="text-green-700 leading-relaxed">{scanResult.listingDraft.description}</p>
+            <div className="md:w-1/2 p-6">
+              <h2 className={`text-3xl font-bold ${theme.colors.text} mb-4`}>
+                {scanResult.itemName || 'Unknown Item'}
+              </h2>
+              
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-lg ${theme.colors.textSecondary}`}>Estimated Value:</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    {scanResult.estimatedValue || 'Value unknown'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className={`text-sm ${theme.colors.textSecondary}`}>Confidence:</span>
+                  <span className={`text-sm font-semibold ${confidenceColor}`}>
+                    {scanResult.confidenceScore || 0}% - {confidenceText}
+                  </span>
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate('/camera')}
+                  className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-lg transition-colors`}
+                >
+                  📸 Scan Another Item
+                </button>
+                
+                <button
+                  onClick={() => navigate('/history')}
+                  className={`w-full ${theme.colors.secondary} ${theme.colors.secondaryText} font-bold py-3 px-6 rounded-lg transition-colors`}
+                >
+                  📱 View All Scans
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Analysis */}
+        <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-8 ${theme.colors.border} border`}>
+          <h3 className={`text-xl font-bold ${theme.colors.text} mb-4`}>AI Analysis</h3>
+          <div className={`${theme.colors.backgroundTertiary} rounded-lg p-4`}>
+            <p className={`${theme.colors.textSecondary} leading-relaxed`}>
+              {showFullAnalysis 
+                ? scanResult.aiAnalysis || 'No detailed analysis available.'
+                : (scanResult.aiAnalysis?.substring(0, 200) + '...' || 'No analysis available.')
+              }
+            </p>
+            {scanResult.aiAnalysis && scanResult.aiAnalysis.length > 200 && (
+              <button
+                onClick={() => setShowFullAnalysis(!showFullAnalysis)}
+                className="text-purple-600 hover:text-purple-800 font-medium mt-2 text-sm"
+              >
+                {showFullAnalysis ? 'Show Less' : 'Read More'}
+              </button>
             )}
           </div>
         </div>
 
-        {/* Similar Listings - Full Width */}
-        {renderSimilarListings()}
+        {/* Marketplace Listing Draft */}
+        {scanResult.listingDraft && (
+          <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-8 ${theme.colors.border} border`}>
+            <h3 className={`text-xl font-bold ${theme.colors.text} mb-4`}>📝 Suggested Listing</h3>
+            <div className={`${theme.colors.backgroundTertiary} rounded-lg p-4`}>
+              <h4 className={`font-semibold ${theme.colors.text} mb-2`}>Title:</h4>
+              <p className={`${theme.colors.textSecondary} mb-4`}>
+                {scanResult.listingDraft.title || 'No title available'}
+              </p>
+              
+              <h4 className={`font-semibold ${theme.colors.text} mb-2`}>Description:</h4>
+              <p className={`${theme.colors.textSecondary} text-sm leading-relaxed`}>
+                {scanResult.listingDraft.description || 'No description available'}
+              </p>
+            </div>
+          </div>
+        )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mt-8">
-          <button
-            onClick={() => navigate('/camera')}
-            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full text-center transition-colors"
-          >
-            📸 Scan Another Item
-          </button>
-          
-          <button
-            onClick={() => navigate('/history')}
-            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full text-center transition-colors"
-          >
-            📋 View History
-          </button>
-        </div>
+        {/* Similar Listings */}
+        {scanResult.similarListings && scanResult.similarListings.length > 0 && (
+          <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 ${theme.colors.border} border`}>
+            <h3 className={`text-xl font-bold ${theme.colors.text} mb-4`}>🛒 Similar Marketplace Listings</h3>
+            <div className="space-y-4">
+              {scanResult.similarListings.slice(0, 5).map((listing, index) => (
+                <div key={index} className={`${theme.colors.backgroundTertiary} rounded-lg p-4`}>
+                  <h4 className={`font-semibold ${theme.colors.text} mb-1 text-sm`}>
+                    {listing.title || 'Untitled Listing'}
+                  </h4>
+                  <p className={`${theme.colors.textSecondary} text-xs mb-2`}>
+                    {listing.snippet || 'No description available'}
+                  </p>
+                  {listing.link && (
+                    <a
+                      href={listing.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-600 hover:text-purple-800 text-xs font-medium"
+                    >
+                      View Listing →
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
