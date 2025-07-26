@@ -33,8 +33,14 @@
       "package": "com.thrifterseye.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "plugins": [
       "@react-native-firebase/app",
       [
