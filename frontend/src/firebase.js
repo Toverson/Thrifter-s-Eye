@@ -3,12 +3,13 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCW6BjHAyGc9Pic4TWKvcE1xxPEXComxMY",
-  authDomain: "thrifters-eye-app.firebaseapp.com",
-  projectId: "thrifters-eye-app",
-  storageBucket: "thrifters-eye-app.appspot.com",
-  messagingSenderId: "308c3b4b446924325",
-  appId: "1:308c3b4b446924325:web:thrifterseye"
+  apiKey: "AIzaSyDGPon7WHgKLRq8DYkamUvbq6pznqNYBus",
+  authDomain: "gen-lang-client-0045692674.firebaseapp.com",
+  projectId: "gen-lang-client-0045692674",
+  storageBucket: "gen-lang-client-0045692674.firebasestorage.app",
+  messagingSenderId: "563280616510",
+  appId: "1:563280616510:web:bff3058114879c6726c56f",
+  measurementId: "G-YQNY58JKC0"
 };
 
 // Initialize Firebase
