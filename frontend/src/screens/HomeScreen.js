@@ -134,11 +134,11 @@ export default function HomeScreen() {
 
         {/* Web testing info */}
         <div className="mt-12 max-w-2xl mx-auto">
-          <div className="bg-blue-500 bg-opacity-20 border border-blue-400 rounded-lg p-4">
-            <h3 className="font-bold text-blue-100 mb-2">Web Testing Mode</h3>
-            <p className="text-blue-100 text-sm">
+          <div className={`${theme.colors.surface} ${theme.colors.border} border rounded-lg p-4`}>
+            <h3 className={`font-bold ${theme.colors.text} mb-2`}>Web Testing Mode</h3>
+            <p className={`${theme.colors.textSecondary} text-sm`}>
               You're now using anonymous authentication - the same flow as the iOS app. 
-              Your session ID: <code className="bg-black bg-opacity-20 px-1 rounded text-xs">
+              Your session ID: <code className={`${theme.colors.surface} bg-opacity-20 px-1 rounded text-xs`}>
                 {auth.currentUser?.uid?.substr(0, 8)}...
               </code>
             </p>
