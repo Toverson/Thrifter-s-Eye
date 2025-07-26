@@ -4,20 +4,33 @@ import { db } from '../firebase';
 export class UserService {
   static async createUserIfNotExists(userId, email) {
     try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
+      console.log('📝 UserService: Starting createUserIfNotExists for:', userId);
+      console.log('📝 UserService: Email:', email);
+      
+      const userDocRef = doc(db, 'users', userId);
+      console.log('📝 UserService: Getting user document...');
+      
+      const userDoc = await getDoc(userDocRef);
+      console.log('📝 UserService: Document exists:', userDoc.exists());
 
       if (!userDoc.exists()) {
-        await setDoc(doc(db, 'users', userId), {
+        console.log('📝 UserService: Creating new user document...');
+        await setDoc(userDocRef, {
           userId,
           email,
           scanCount: 0,
           isProSubscriber: false,
           createdAt: serverTimestamp(),
         });
-        console.log('User document created');
+        console.log('✅ UserService: User document created successfully');
+      } else {
+        console.log('✅ UserService: User document already exists');
       }
     } catch (error) {
-      console.error('Error creating user document:', error);
+      console.error('❌ UserService: Error creating user document:', error);
+      console.error('❌ UserService: Error code:', error.code);
+      console.error('❌ UserService: Error message:', error.message);
+      throw error; // Re-throw so the caller can handle it
     }
   }
 
