@@ -90,9 +90,9 @@ export default function CameraScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${theme.colors.backgroundSecondary}`}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className={`${theme.colors.surface} shadow-sm ${theme.colors.border} border-b`}>
         <div className="container mx-auto px-4 py-4 flex items-center">
           <button
             onClick={() => navigate('/')}
@@ -100,7 +100,7 @@ export default function CameraScreen() {
           >
             ← Back to Home
           </button>
-          <h1 className="flex-1 text-center text-xl font-bold">Scan Item</h1>
+          <h1 className={`flex-1 text-center text-xl font-bold ${theme.colors.text}`}>Scan Item</h1>
           <div className="w-20"></div> {/* Spacer for centering */}
         </div>
       </div>
@@ -120,14 +120,14 @@ export default function CameraScreen() {
             <div className="space-y-4 max-w-md mx-auto">
               <button
                 onClick={proceedWithScan}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors"
+                className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors`}
               >
                 🔍 Analyze Item
               </button>
               
               <button
                 onClick={triggerFileInput}
-                className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-colors"
+                className={`w-full ${theme.colors.secondary} ${theme.colors.secondaryText} font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-colors`}
               >
                 📷 Choose Different Photo
               </button>
@@ -136,10 +136,10 @@ export default function CameraScreen() {
         ) : (
           <div className="text-center">
             <div className="mb-8">
-              <div className="w-80 h-80 mx-auto bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-400">
+              <div className={`w-80 h-80 mx-auto ${theme.colors.backgroundTertiary} rounded-lg flex items-center justify-center ${theme.colors.border} border-2 border-dashed`}>
                 <div className="text-center">
-                  <span className="text-6xl text-gray-400 block mb-4">📷</span>
-                  <p className="text-gray-600">
+                  <span className={`text-6xl ${theme.colors.textSecondary} block mb-4`}>📷</span>
+                  <p className={theme.colors.textSecondary}>
                     Take a clear photo of the item you want to identify and value
                   </p>
                 </div>
@@ -148,7 +148,7 @@ export default function CameraScreen() {
             
             <button
               onClick={triggerFileInput}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors"
+              className={`${theme.colors.primary} ${theme.colors.primaryText} font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors`}
             >
               📸 Take Photo
             </button>
@@ -165,10 +165,10 @@ export default function CameraScreen() {
         />
 
         {/* Instructions */}
-        <div className="mt-12 max-w-2xl mx-auto">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 className="font-bold text-blue-800 mb-3">📋 Tips for Best Results</h3>
-            <ul className="text-blue-700 space-y-2 text-sm">
+        <div className={`mt-12 max-w-2xl mx-auto`}>
+          <div className={`${theme.colors.surface} ${theme.colors.border} border rounded-lg p-6`}>
+            <h3 className={`font-bold ${theme.colors.text} mb-3`}>📋 Tips for Best Results</h3>
+            <ul className={`${theme.colors.textSecondary} space-y-2 text-sm`}>
               <li>• Ensure good lighting on the item</li>
               <li>• Take a clear, focused photo</li>
               <li>• Include any visible text or brand markings</li>
