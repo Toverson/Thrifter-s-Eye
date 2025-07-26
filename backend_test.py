@@ -378,6 +378,7 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         return {
             "health_check": health_ok,
             "scan_endpoint": scan_ok,
+            "backend_logs": logs_ok,
             "history_endpoint": history_ok,
             "individual_scan": individual_ok
         }
