@@ -31,6 +31,7 @@ class ThrifterEyeBackendTester:
         self.test_results = {
             "health_check": {"status": "pending", "details": ""},
             "scan_endpoint": {"status": "pending", "details": ""},
+            "backend_logs": {"status": "pending", "details": ""},
             "history_endpoint": {"status": "pending", "details": ""},
             "individual_scan": {"status": "pending", "details": ""}
         }
