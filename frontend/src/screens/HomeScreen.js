@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
-import auth from '@react-native-firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import { UserService } from '../services/UserService';
 import { LocationService } from '../services/LocationService';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen() {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadUserData();
@@ -21,10 +17,11 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   const loadUserData = async () => {
-    const user = auth().currentUser;
+    const user = auth.currentUser;
     if (user) {
       const data = await UserService.getUserData(user.uid);
       setUserData(data);
+      setLoading(false);
     }
   };
 
@@ -34,7 +31,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleScanPress = async () => {
-    const user = auth().currentUser;
+    const user = auth.currentUser;
     if (!user) return;
 
     // Check if user can scan
@@ -42,27 +39,18 @@ export default function HomeScreen({ navigation }) {
     
     if (!canScan) {
       // Redirect to paywall
-      navigation.navigate('Paywall');
+      navigate('/paywall');
       return;
     }
 
     // Navigate to camera with location data
-    navigation.navigate('Camera', { location });
+    navigate('/camera', { state: { location } });
   };
 
-  const handleHistoryPress = () => {
-    navigation.navigate('History');
-  };
-
-  const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', onPress: () => auth().signOut() },
-      ]
-    );
+  const handleSignOut = async () => {
+    if (window.confirm('Are you sure you want to sign out?')) {
+      await signOut(auth);
+    }
   };
 
   const getScanCountDisplay = () => {
@@ -76,161 +64,73 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logoPlaceholder}>
-              <Text style={styles.logoText}>👁️</Text>
-            </View>
-          </View>
-          <Text style={styles.appName}>Thrifter's Eye</Text>
-          <Text style={styles.tagline}>AI-powered item identification and valuation</Text>
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header with sign out */}
+        <div className="flex justify-between items-center mb-8">
+          <div></div>
+          <button
+            onClick={handleSignOut}
+            className="text-white hover:text-blue-200 text-sm"
+          >
+            Sign Out
+          </button>
+        </div>
+
+        {/* Main content */}
+        <div className="text-center mb-12">
+          <div className="mb-6">
+            <div className="w-24 h-24 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-6">
+              <span className="text-5xl">👁️</span>
+            </div>
+          </div>
+          <h1 className="text-5xl font-bold text-white mb-4">Thrifter's Eye</h1>
+          <p className="text-xl text-blue-100 mb-6">AI-powered item identification and valuation</p>
           
           {/* Location indicator */}
           {location && (
-            <Text style={styles.locationText}>
-              📍 {location.countryCode} • Pricing in {location.currencyCode}
-            </Text>
+            <div className="inline-block bg-white bg-opacity-20 px-4 py-2 rounded-full mb-4">
+              <span className="text-white">📍 {location.countryCode} • Pricing in {location.currencyCode}</span>
+            </div>
           )}
-        </View>
+        </div>
 
         {/* User status */}
-        <View style={styles.statusContainer}>
-          <Text style={styles.statusText}>{getScanCountDisplay()}</Text>
-        </View>
+        <div className="text-center mb-8">
+          <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto">
+            <p className="text-white font-semibold">{getScanCountDisplay()}</p>
+          </div>
+        </div>
 
         {/* Action buttons */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.scanButton} 
-            onPress={handleScanPress}
+        <div className="max-w-md mx-auto space-y-4">
+          <button
+            onClick={handleScanPress}
+            className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-all duration-200 transform hover:scale-105"
           >
-            <Text style={styles.scanButtonText}>📸 Scan Item</Text>
-          </TouchableOpacity>
+            📸 Scan Item
+          </button>
           
-          <TouchableOpacity 
-            style={styles.historyButton} 
-            onPress={handleHistoryPress}
+          <button
+            onClick={() => navigate('/history')}
+            className="w-full bg-purple-500 hover:bg-purple-400 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-all duration-200"
           >
-            <Text style={styles.historyButtonText}>📋 View History</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Sign out button */}
-        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+            📋 View History
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#667eea',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoContainer: {
-    marginBottom: 20,
-  },
-  logoPlaceholder: {
-    width: 80,
-    height: 80,
-    backgroundColor: 'white',
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoText: {
-    fontSize: 40,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 8,
-  },
-  tagline: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  locationText: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-  },
-  statusContainer: {
-    marginBottom: 30,
-  },
-  statusText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  buttonContainer: {
-    width: '100%',
-    maxWidth: 300,
-  },
-  scanButton: {
-    backgroundColor: 'white',
-    paddingVertical: 18,
-    borderRadius: 30,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  scanButtonText: {
-    color: '#667eea',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  historyButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingVertical: 15,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: 'white',
-  },
-  historyButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  signOutButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    padding: 10,
-  },
-  signOutText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 16,
-  },
-});
