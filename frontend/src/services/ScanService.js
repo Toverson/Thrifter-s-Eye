@@ -39,7 +39,14 @@ export class ScanService {
   static async getUserScans(limitCount = 10) {
     try {
       const user = auth.currentUser;
-      if (!user) throw new Error('User not authenticated');
+      console.log('🔄 ScanService: getUserScans called');
+      console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      console.log('🔄 ScanService: Querying scans for userId:', user.uid);
 
       const scansQuery = query(
         collection(db, 'scans'),
@@ -49,14 +56,28 @@ export class ScanService {
       );
 
       const scansSnapshot = await getDocs(scansQuery);
-      return scansSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        // Convert Firestore timestamp to date for display
-        timestamp: doc.data().timestamp?.toDate() || new Date(),
-      }));
+      console.log('🔄 ScanService: Query returned', scansSnapshot.docs.length, 'documents');
+      
+      const scans = scansSnapshot.docs.map(doc => {
+        const data = doc.data();
+        console.log('🔄 ScanService: Processing scan:', doc.id, '- userId:', data.userId);
+        return {
+          id: doc.id,
+          ...data,
+          // Convert Firestore timestamp to date for display
+          timestamp: data.timestamp?.toDate() || new Date(),
+        };
+      });
+
+      console.log('✅ ScanService: Processed', scans.length, 'scans successfully');
+      return scans;
     } catch (error) {
-      console.error('Error getting user scans:', error);
+      console.error('❌ ScanService: Error getting user scans:', error);
+      console.error('❌ ScanService: Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
       return [];
     }
   }
