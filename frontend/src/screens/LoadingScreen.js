@@ -4,10 +4,12 @@ import { auth } from '../firebase';
 import { CloudFunctionService } from '../services/CloudFunctionService';
 import { ScanService } from '../services/ScanService';
 import { UserService } from '../services/UserService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function LoadingScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useTheme();
   const { imageBase64, imagePreview, location: userLocation } = location.state || {};
   const [loadingMessage, setLoadingMessage] = useState('Identifying object...');
 
