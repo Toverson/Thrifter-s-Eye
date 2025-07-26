@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
 import { ScanService } from '../services/ScanService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function HistoryScreen() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
