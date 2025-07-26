@@ -96,7 +96,7 @@ async def analyze_image_with_vision(image_data: bytes) -> Dict[str, Any]:
         logging.error(f"Vision API error: {e}")
         return {"objects": [], "texts": [], "primary_object": "unknown item"}
 
-async def search_marketplaces(vision_data: Dict[str, Any]) -> Dict[str, Any]:
+async def search_marketplaces(vision_data: Dict[str, Any], country_code: str = "US") -> Dict[str, Any]:
     """Search marketplaces using Google Custom Search API"""
     try:
         # Build search query from vision data
