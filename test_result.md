@@ -238,6 +238,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ VERIFIED: End-to-end AI pipeline now working perfectly with real Google Cloud Vision API. Multiple test images produce varied, specific results proving the system analyzes actual image content rather than using generic fallbacks. Examples: 'Vintage Rolex Watch' ($50-$300), 'Antique First Edition Book' ($30-$100), '1964 Liberty Silver Dollar' ($20-$35). Vision API detects real text from images, Custom Search finds relevant listings, Gemini AI provides intelligent analysis. Database storage confirmed. The user's issue of getting identical results for every scan has been completely resolved."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL FIX CONFIRMED: The search_marketplaces() function signature error has been completely resolved. JSON-based scan endpoint working perfectly with proper country_code and currency_code parameters. Comprehensive testing shows: 1) No more 'search_marketplaces() takes 1 positional argument but 2 were given' errors in logs, 2) Country/currency awareness working (CA/CAD, US/USD), 3) AI pipeline producing varied results for different images (watch vs book), 4) Database storage now working correctly, 5) All response fields present (itemName, estimatedValue, confidenceScore, aiAnalysis, listingDraft, similarListings). The backend API resolves the user's reported issues of desktop 'analyzes for a split second and returns to scan items screen' and mobile 'gets stuck for 25 seconds then shows Failed to analyze image'. Fixed minor database storage issue during testing."
 
   - task: "History Retrieval - GET /api/history"
     implemented: true
