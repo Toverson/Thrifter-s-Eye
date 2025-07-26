@@ -259,20 +259,22 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<HomeScreen />} />
-          <Route path="/camera" element={<CameraScreen />} />
-          <Route path="/loading" element={<LoadingScreen />} />
-          <Route path="/results" element={<ResultsScreen />} />
-          <Route path="/history" element={<HistoryScreen />} />
-          <Route path="/paywall" element={<PaywallScreen />} />
-          <Route path="/settings" element={<SettingsScreen />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<HomeScreen />} />
+            <Route path="/camera" element={<CameraScreen />} />
+            <Route path="/loading" element={<LoadingScreen />} />
+            <Route path="/results" element={<ResultsScreen />} />
+            <Route path="/history" element={<HistoryScreen />} />
+            <Route path="/paywall" element={<PaywallScreen />} />
+            <Route path="/settings" element={<SettingsScreen />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
