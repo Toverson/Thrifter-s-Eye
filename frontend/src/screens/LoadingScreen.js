@@ -113,7 +113,7 @@ export default function LoadingScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center p-4">
+    <div className={`min-h-screen ${theme.colors.gradient} flex items-center justify-center p-4`}>
       <div className="text-center">
         {/* Show the image being processed */}
         {imagePreview && (
