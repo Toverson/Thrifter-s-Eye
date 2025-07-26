@@ -48,20 +48,29 @@ export default function LoadingScreen() {
         return;
       }
 
+      console.log('🔄 LoadingScreen: Starting image processing');
+      console.log('📍 LoadingScreen: User ID:', user.uid);
+      console.log('📍 LoadingScreen: Location:', userLocation);
+
       // Call the cloud function to analyze the image
+      console.log('🔄 LoadingScreen: Calling CloudFunctionService');
       const result = await CloudFunctionService.scanItem(
         imageBase64,
         userLocation?.countryCode || 'US',
         userLocation?.currencyCode || 'USD'
       );
+      console.log('✅ LoadingScreen: CloudFunctionService completed');
 
       // Increment user's scan count (for free users)
+      console.log('🔄 LoadingScreen: Getting user data');
       const userData = await UserService.getUserData(user.uid);
       if (userData && !userData.isProSubscriber) {
+        console.log('🔄 LoadingScreen: Incrementing scan count');
         await UserService.incrementScanCount(user.uid);
       }
 
       // Save the scan result to Firestore
+      console.log('🔄 LoadingScreen: Preparing scan data');
       const scanData = {
         ...result,
         imageBase64,
@@ -69,9 +78,12 @@ export default function LoadingScreen() {
         currencyCode: userLocation?.currencyCode || 'USD',
       };
 
+      console.log('🔄 LoadingScreen: Saving scan to Firestore');
       const scanId = await ScanService.saveScan(scanData);
+      console.log('✅ LoadingScreen: Scan saved with ID:', scanId);
 
       // Navigate to results screen
+      console.log('🔄 LoadingScreen: Navigating to results');
       navigate('/results', {
         state: {
           scanResult: { ...scanData, id: scanId },
@@ -80,8 +92,20 @@ export default function LoadingScreen() {
       });
 
     } catch (error) {
-      console.error('Processing error:', error);
-      alert('Failed to analyze image. Please try again.');
+      console.error('❌ LoadingScreen: Processing error:', error);
+      
+      // More specific error messages
+      let errorMessage = 'Failed to analyze image. Please try again.';
+      
+      if (error.message.includes('timeout') || error.message.includes('timed out')) {
+        errorMessage = 'Request timed out. Please check your internet connection and try again.';
+      } else if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (error.message.includes('500')) {
+        errorMessage = 'Server error. Please try again in a moment.';
+      }
+      
+      alert(errorMessage);
       navigate('/camera');
     }
   };
