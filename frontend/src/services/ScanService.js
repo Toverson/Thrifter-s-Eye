@@ -4,17 +4,17 @@ export class ScanService {
   static async saveScan(scanData) {
     try {
       const user = auth.currentUser;
-      console.log('🔄 ScanService: saveScan called - USING BACKEND API');
+      console.log('🔄 ScanService: saveScan called - USING BACKEND API WITH USER ID');
       console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
       
       if (!user) {
         throw new Error('User not authenticated');
       }
 
-      console.log('🔄 ScanService: Using backend API POST /api/scan');
+      console.log('🔄 ScanService: Using backend API POST /api/scan with userId:', user.uid);
       console.log('🔄 ScanService: Scan data keys:', Object.keys(scanData));
 
-      // Use backend API instead of direct Firestore
+      // Use backend API with user ID
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       const response = await fetch(`${backendUrl}/api/scan`, {
         method: 'POST',
@@ -24,7 +24,8 @@ export class ScanService {
         body: JSON.stringify({
           imageBase64: scanData.imageBase64,
           countryCode: scanData.countryCode || 'US',
-          currencyCode: scanData.currencyCode || 'USD'
+          currencyCode: scanData.currencyCode || 'USD',
+          userId: user.uid  // Send actual Firebase user ID
         }),
       });
 
@@ -34,6 +35,7 @@ export class ScanService {
 
       const result = await response.json();
       console.log('✅ ScanService: Scan saved successfully via backend API with ID:', result.id);
+      console.log('✅ ScanService: Scan saved for user:', user.uid);
       
       return result.id;
     } catch (error) {
