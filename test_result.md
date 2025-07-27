@@ -434,9 +434,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Firebase Anonymous Authentication - REGRESSION (fix auth failure after theme changes)"
-    - "Scan History Saving - DEBUG (verify Firestore writes with userId)"
-    - "Theme System - TEST (verify toggle and persistence)"
+    - "Firebase Anonymous Authentication - CRITICAL BLOCKER (authentication preventing all app access)"
+    - "Scan History Display - DEBUG (after auth fixed, focus on frontend retrieval logic)"
+    - "Theme System - TEST (verify toggle and persistence after auth fixed)"
   stuck_tasks:
     - "Firebase Anonymous Authentication"
     - "Scan History Functionality"
