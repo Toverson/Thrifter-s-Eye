@@ -425,10 +425,10 @@ This resolves the privacy concerns with scan history access.
             return True
                 
         except requests.exceptions.RequestException as e:
-            self.log_test("history_endpoint", "fail", f"Connection error: {str(e)}")
+            self.log_test("history_userid_validation", "fail", f"Connection error: {str(e)}")
             return False
         except Exception as e:
-            self.log_test("history_endpoint", "fail", f"Unexpected error: {str(e)}")
+            self.log_test("history_userid_validation", "fail", f"Unexpected error: {str(e)}")
             return False
 
     def test_history_endpoint(self):
