@@ -3,12 +3,17 @@ export class CloudFunctionService {
   // For web testing, we'll use the existing backend API
   static baseUrl = process.env.REACT_APP_BACKEND_URL;
 
-  static async scanItem(imageBase64, countryCode, currencyCode) {
+  static async scanItem(imageBase64, countryCode, currencyCode, userId) {
     try {
       console.log('🚀 CloudFunction: Starting scan request');
       console.log('📍 CloudFunction: Base URL:', this.baseUrl);
       console.log('📍 CloudFunction: Country/Currency:', countryCode, currencyCode);
+      console.log('📍 CloudFunction: User ID:', userId);
       console.log('📍 CloudFunction: Image size:', Math.round(imageBase64.length / 1024), 'KB');
+
+      if (!userId) {
+        throw new Error('User ID is required for scan requests');
+      }
 
       // Create an AbortController for timeout handling
       const controller = new AbortController();
@@ -29,6 +34,7 @@ export class CloudFunctionService {
           imageBase64,
           countryCode,
           currencyCode,
+          userId,  // Include userId in the request
         }),
         signal: controller.signal, // Add abort signal
       });
