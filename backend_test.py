@@ -30,6 +30,7 @@ class ThrifterEyeBackendTester:
     def __init__(self):
         self.test_results = {
             "health_check": {"status": "pending", "details": ""},
+            "scan_userid_validation": {"status": "pending", "details": ""},
             "scan_endpoint": {"status": "pending", "details": ""},
             "backend_logs": {"status": "pending", "details": ""},
             "history_endpoint": {"status": "pending", "details": ""},
