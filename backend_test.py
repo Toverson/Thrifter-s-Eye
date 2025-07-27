@@ -872,7 +872,14 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         # Test 3: Backend Logs Check
         logs_ok = self.test_backend_logs()
         
-        # Test 4: History Endpoint (only if health check passes)
+        # Test 4A: CRITICAL - History userId Validation (only if health check passes)
+        history_userid_validation_ok = False
+        if health_ok:
+            history_userid_validation_ok = self.test_history_endpoint_userid_validation()
+        else:
+            self.log_test("history_userid_validation", "skip", "Skipped due to health check failure")
+        
+        # Test 4B: History Endpoint (only if health check passes)
         history_ok = False
         if health_ok:
             history_ok = self.test_history_endpoint()
