@@ -154,7 +154,7 @@ export default function PaywallScreen() {
           </button>
 
           <p className={`text-xs ${theme.colors.textMuted} text-center mt-4`}>
-            In the actual iOS app, this would integrate with RevenueCat for subscription management
+            Subscription managed through the App Store
           </p>
         </div>
 
