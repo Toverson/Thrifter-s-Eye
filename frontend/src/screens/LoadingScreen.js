@@ -52,6 +52,12 @@ export default function LoadingScreen() {
   }, []);
 
   const processImage = async () => {
+    // Double-check to prevent any duplicate processing
+    if (processedRef.current !== true) {
+      console.log('⚠️ LoadingScreen: processImage called but processedRef not set, preventing execution');
+      return;
+    }
+    
     try {
       const user = auth.currentUser;
       console.log('🔄 LoadingScreen: Starting image processing');
@@ -59,6 +65,7 @@ export default function LoadingScreen() {
       
       if (!user) {
         console.error('❌ LoadingScreen: No authenticated user found');
+        processedRef.current = false; // Reset on error
         navigate('/login');
         return;
       }
