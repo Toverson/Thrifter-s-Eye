@@ -186,6 +186,8 @@ export default function HistoryScreen() {
           >
             🗑️ Clear History
           </button>
+            🗑️ Clear History
+          </button>
         </div>
       </div>
     </div>
