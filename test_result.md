@@ -335,6 +335,18 @@ backend:
         agent: "testing"
         comment: "✅ Gemini AI integration working correctly. Successfully analyzes vision and search data to provide item identification, value estimation, confidence scoring, detailed analysis, and marketplace listing drafts. API key configured properly."
 
+  - task: "Privacy Fix - User-Specific Scan Storage"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PRIVACY FIX VERIFICATION COMPLETE - ALL TESTS PASSED! Comprehensive testing confirms the critical privacy issue has been completely resolved. Privacy controls working: 1) GET /api/history correctly requires user_id parameter (HTTP 400 for missing/empty), 2) POST /api/scan correctly requires userId parameter (HTTP 400 for missing/empty), 3) User isolation verified - different users can only see their own scans, 4) Legacy data protection - 50 old scans with user_id='prototype_user_01' remain accessible to that user but isolated from new users, 5) Ownership checks working with HTTP 403 for unauthorized access. Privacy breach resolved - users can no longer see each other's scans. System properly segregates scan data by user_id ensuring complete privacy isolation. Fixed minor HTTP status code issue in scan endpoint error handling."
+
 frontend:
   - task: "Firebase Anonymous Authentication"
     implemented: true
