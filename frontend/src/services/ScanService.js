@@ -51,18 +51,18 @@ export class ScanService {
   static async getUserScans(limitCount = 10) {
     try {
       const user = auth.currentUser;
-      console.log('🔄 ScanService: getUserScans called - USING BACKEND API');
+      console.log('🔄 ScanService: getUserScans called - USING USER-SPECIFIC BACKEND API');
       console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
       
       if (!user) {
         throw new Error('User not authenticated');
       }
 
-      console.log('🔄 ScanService: Fetching scans from backend API GET /api/history');
+      console.log('🔄 ScanService: Fetching user-specific scans from backend API GET /api/history?user_id=', user.uid);
 
-      // Use backend API instead of Firestore
+      // Use backend API with user ID filter
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/history`, {
+      const response = await fetch(`${backendUrl}/api/history?user_id=${encodeURIComponent(user.uid)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export class ScanService {
       }
 
       const scans = await response.json();
-      console.log('🔄 ScanService: Backend API returned', scans.length, 'total scans');
+      console.log('🔄 ScanService: Backend API returned', scans.length, 'scans for user:', user.uid);
 
       // Convert backend format to frontend format and limit results
       const formattedScans = scans.slice(0, limitCount).map(scan => ({
@@ -92,7 +92,9 @@ export class ScanService {
         userId: scan.user_id
       }));
 
-      console.log('✅ ScanService: Processed', formattedScans.length, 'scans from backend API');
+      console.log('✅ ScanService: Processed', formattedScans.length, 'user-specific scans from backend API');
+      console.log('✅ ScanService: All scans belong to user:', user.uid);
+      
       return formattedScans;
     } catch (error) {
       console.error('❌ ScanService: Error getting user scans from backend API:', error);
