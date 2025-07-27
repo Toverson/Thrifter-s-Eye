@@ -335,24 +335,31 @@ async def get_scan_history(user_id: Optional[str] = None):
         logging.error(f"History error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get history: {str(e)}")
 
-@api_router.get("/scan/{scan_id}", response_model=ScanResult)
-async def get_scan_result(scan_id: str, user_id: Optional[str] = None):
-    """Get specific scan result - with user ownership check"""
+@api_router.delete("/history", response_model=dict)
+async def clear_user_history(user_id: Optional[str] = None):
+    """Clear all scan history for the user"""
     try:
-        scan = await db.scans.find_one({"id": scan_id})
-        if not scan:
-            raise HTTPException(status_code=404, detail="Scan not found")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id parameter is required")
         
-        # Optional: Check if user owns this scan
-        if user_id and scan.get("user_id") != user_id:
-            raise HTTPException(status_code=403, detail="Access denied - scan belongs to another user")
+        logging.info(f"Clearing all scan history for user: {user_id}")
         
-        return ScanResult(**scan)
+        # Delete all scans for the user
+        delete_result = await db.scans.delete_many({"user_id": user_id})
+        deleted_count = delete_result.deleted_count
+        
+        logging.info(f"Deleted {deleted_count} scans for user: {user_id}")
+        
+        return {
+            "success": True,
+            "message": f"Cleared {deleted_count} scans from history",
+            "deleted_count": deleted_count
+        }
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Get scan error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get scan: {str(e)}")
+        logging.error(f"Clear history error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to clear history: {str(e)}")
 
 # Include the router in the main app
 app.include_router(api_router)
