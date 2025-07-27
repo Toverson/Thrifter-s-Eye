@@ -72,24 +72,20 @@ export default function LoadingScreen() {
         await UserService.incrementScanCount(user.uid);
       }
 
-      // Save the scan result to Firestore
-      console.log('🔄 LoadingScreen: Preparing scan data');
-      const scanData = {
-        ...result,
-        imageBase64,
-        countryCode: userLocation?.countryCode || 'US',
-        currencyCode: userLocation?.currencyCode || 'USD',
-      };
-
-      console.log('🔄 LoadingScreen: Saving scan to Firestore');
-      const scanId = await ScanService.saveScan(scanData);
-      console.log('✅ LoadingScreen: Scan saved with ID:', scanId);
+      // The scan is already saved by the backend API call
+      // CloudFunctionService.scanItem() returns the complete scan result with ID
+      console.log('✅ LoadingScreen: Scan already saved by backend API with ID:', result.id);
 
       // Navigate to results screen
       console.log('🔄 LoadingScreen: Navigating to results');
       navigate('/results', {
         state: {
-          scanResult: { ...scanData, id: scanId },
+          scanResult: {
+            ...result,
+            imageBase64, // Add the image for display
+            countryCode: userLocation?.countryCode || 'US',
+            currencyCode: userLocation?.currencyCode || 'USD',
+          },
           imagePreview,
         }
       });
