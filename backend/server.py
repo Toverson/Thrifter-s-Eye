@@ -236,12 +236,17 @@ async def root():
 async def scan_item(request: ScanRequest):
     """Main endpoint for scanning and analyzing items"""
     try:
+        # Validate user ID is provided
+        if not request.userId:
+            raise HTTPException(status_code=400, detail="userId is required")
+        
         # Handle both file upload and JSON request formats
         if hasattr(request, 'imageBase64'):
             # JSON request format (from web app)
             image_base64 = request.imageBase64
             country_code = getattr(request, 'countryCode', 'US')
             currency_code = getattr(request, 'currencyCode', 'USD')
+            user_id = request.userId
             image_data = base64.b64decode(image_base64)
         else:
             # File upload format (legacy)
@@ -249,6 +254,9 @@ async def scan_item(request: ScanRequest):
             image_base64 = base64.b64encode(image_data).decode('utf-8')
             country_code = 'US'
             currency_code = 'USD'
+            user_id = request.userId
+        
+        logging.info(f"Processing scan for user: {user_id}")
         
         # Step 1: Analyze with Vision API
         logging.info("Analyzing image with Vision API...")
@@ -264,6 +272,7 @@ async def scan_item(request: ScanRequest):
         
         # Create scan result
         scan_result = ScanResult(
+            user_id=user_id,  # Use actual user ID
             image_base64=image_base64,
             item_name=ai_result.get("itemName", "Unknown Item"),
             estimated_value=ai_result.get("estimatedValue", "Unknown"),
@@ -279,7 +288,7 @@ async def scan_item(request: ScanRequest):
         
         # Store in database
         await db.scans.insert_one(scan_result.dict())
-        logging.info(f"Scan result stored in database with ID: {scan_result.id}")
+        logging.info(f"Scan result stored in database with ID: {scan_result.id} for user: {user_id}")
         
         return scan_result
         
