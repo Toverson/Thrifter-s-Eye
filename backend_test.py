@@ -751,8 +751,207 @@ This resolves the privacy concerns with scan history access.
             self.log_test("scan_save_retrieve", "fail", f"Unexpected error: {str(e)}")
             return False
 
+    def test_user_isolation_critical(self):
+        """Test 8: CRITICAL USER ISOLATION - Test cross-user privacy"""
+        try:
+            print("\n🔍 CRITICAL TEST: USER ISOLATION VERIFICATION...")
+            print("🎯 FOCUS: Testing if users can see each other's scans (PRIVACY BREACH)")
+            
+            # Create a simple test image (1x1 pixel PNG in base64)
+            test_image_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA4GgKxQAAAABJRU5ErkJggg=="
+            
+            # Step 1: Create scan for User A
+            print("📤 Step 1: Creating scan for User A...")
+            user_a_id = "isolation_test_user_A"
+            payload_a = {
+                "imageBase64": test_image_base64,
+                "countryCode": "US",
+                "currencyCode": "USD",
+                "userId": user_a_id
+            }
+            
+            scan_a_response = requests.post(
+                f"{API_BASE}/scan", 
+                json=payload_a,
+                headers={'Content-Type': 'application/json'},
+                timeout=60
+            )
+            
+            if scan_a_response.status_code != 200:
+                self.log_test("user_isolation", "fail", 
+                            f"Failed to create scan for User A: HTTP {scan_a_response.status_code}")
+                return False
+            
+            scan_a_data = scan_a_response.json()
+            scan_a_id = scan_a_data.get('id')
+            print(f"✅ User A scan created: {scan_a_id}")
+            
+            # Step 2: Create scan for User B
+            print("📤 Step 2: Creating scan for User B...")
+            user_b_id = "isolation_test_user_B"
+            payload_b = {
+                "imageBase64": test_image_base64,
+                "countryCode": "CA",
+                "currencyCode": "CAD",
+                "userId": user_b_id
+            }
+            
+            scan_b_response = requests.post(
+                f"{API_BASE}/scan", 
+                json=payload_b,
+                headers={'Content-Type': 'application/json'},
+                timeout=60
+            )
+            
+            if scan_b_response.status_code != 200:
+                self.log_test("user_isolation", "fail", 
+                            f"Failed to create scan for User B: HTTP {scan_b_response.status_code}")
+                return False
+            
+            scan_b_data = scan_b_response.json()
+            scan_b_id = scan_b_data.get('id')
+            print(f"✅ User B scan created: {scan_b_id}")
+            
+            # Step 3: Test User A can see their own scan
+            print("🔍 Step 3: Testing User A can see their own scan...")
+            history_a_response = requests.get(f"{API_BASE}/history?user_id={user_a_id}", timeout=10)
+            
+            if history_a_response.status_code != 200:
+                self.log_test("user_isolation", "fail", 
+                            f"Failed to get User A history: HTTP {history_a_response.status_code}")
+                return False
+            
+            history_a_data = history_a_response.json()
+            user_a_scan_ids = [scan.get('id') for scan in history_a_data]
+            user_a_has_own_scan = scan_a_id in user_a_scan_ids
+            user_a_has_user_b_scan = scan_b_id in user_a_scan_ids
+            
+            print(f"   User A history: {len(history_a_data)} scans")
+            print(f"   User A can see own scan: {'✅ YES' if user_a_has_own_scan else '❌ NO'}")
+            print(f"   User A can see User B scan: {'❌ YES (PRIVACY BREACH!)' if user_a_has_user_b_scan else '✅ NO (GOOD)'}")
+            
+            # Step 4: Test User B can see their own scan
+            print("🔍 Step 4: Testing User B can see their own scan...")
+            history_b_response = requests.get(f"{API_BASE}/history?user_id={user_b_id}", timeout=10)
+            
+            if history_b_response.status_code != 200:
+                self.log_test("user_isolation", "fail", 
+                            f"Failed to get User B history: HTTP {history_b_response.status_code}")
+                return False
+            
+            history_b_data = history_b_response.json()
+            user_b_scan_ids = [scan.get('id') for scan in history_b_data]
+            user_b_has_own_scan = scan_b_id in user_b_scan_ids
+            user_b_has_user_a_scan = scan_a_id in user_b_scan_ids
+            
+            print(f"   User B history: {len(history_b_data)} scans")
+            print(f"   User B can see own scan: {'✅ YES' if user_b_has_own_scan else '❌ NO'}")
+            print(f"   User B can see User A scan: {'❌ YES (PRIVACY BREACH!)' if user_b_has_user_a_scan else '✅ NO (GOOD)'}")
+            
+            # Step 5: Test cross-user individual scan access
+            print("🔍 Step 5: Testing cross-user individual scan access...")
+            
+            # User A trying to access User B's scan
+            cross_access_a_response = requests.get(f"{API_BASE}/scan/{scan_b_id}?user_id={user_a_id}", timeout=10)
+            user_a_can_access_b_scan = cross_access_a_response.status_code == 200
+            
+            # User B trying to access User A's scan
+            cross_access_b_response = requests.get(f"{API_BASE}/scan/{scan_a_id}?user_id={user_b_id}", timeout=10)
+            user_b_can_access_a_scan = cross_access_b_response.status_code == 200
+            
+            print(f"   User A can access User B's scan: {'❌ YES (PRIVACY BREACH!)' if user_a_can_access_b_scan else '✅ NO (GOOD)'}")
+            print(f"   User B can access User A's scan: {'❌ YES (PRIVACY BREACH!)' if user_b_can_access_a_scan else '✅ NO (GOOD)'}")
+            
+            # Step 6: Check database for user ID distribution
+            print("🔍 Step 6: Analyzing database user ID distribution...")
+            
+            # Get all scans to analyze user distribution
+            all_users_response = requests.get(f"{API_BASE}/history?user_id=prototype_user_01", timeout=10)
+            legacy_scan_count = len(all_users_response.json()) if all_users_response.status_code == 200 else 0
+            
+            # Analysis and Results
+            privacy_breach_detected = (
+                user_a_has_user_b_scan or 
+                user_b_has_user_a_scan or 
+                user_a_can_access_b_scan or 
+                user_b_can_access_a_scan
+            )
+            
+            isolation_working = (
+                user_a_has_own_scan and 
+                user_b_has_own_scan and 
+                not user_a_has_user_b_scan and 
+                not user_b_has_user_a_scan and
+                not user_a_can_access_b_scan and
+                not user_b_can_access_a_scan
+            )
+            
+            details = f"""
+🔒 CRITICAL USER ISOLATION TEST RESULTS:
+=======================================
+
+📊 TEST SUMMARY:
+   - User A ID: '{user_a_id}'
+   - User B ID: '{user_b_id}'
+   - User A Scan ID: {scan_a_id}
+   - User B Scan ID: {scan_b_id}
+
+🔍 PRIVACY ISOLATION RESULTS:
+
+✅ USER A ISOLATION:
+   - Can see own scan: {'✅ YES' if user_a_has_own_scan else '❌ NO'}
+   - Can see User B scan: {'❌ YES (BREACH!)' if user_a_has_user_b_scan else '✅ NO'}
+   - Can access User B scan directly: {'❌ YES (BREACH!)' if user_a_can_access_b_scan else '✅ NO'}
+   - Total scans in history: {len(history_a_data)}
+
+✅ USER B ISOLATION:
+   - Can see own scan: {'✅ YES' if user_b_has_own_scan else '❌ NO'}
+   - Can see User A scan: {'❌ YES (BREACH!)' if user_b_has_user_a_scan else '✅ NO'}
+   - Can access User A scan directly: {'❌ YES (BREACH!)' if user_b_can_access_a_scan else '✅ NO'}
+   - Total scans in history: {len(history_b_data)}
+
+📈 DATABASE ANALYSIS:
+   - Legacy scans (prototype_user_01): {legacy_scan_count}
+   - User A scans: {len(history_a_data)}
+   - User B scans: {len(history_b_data)}
+
+🎯 FINAL VERDICT:
+   {'❌ PRIVACY BREACH DETECTED!' if privacy_breach_detected else '✅ USER ISOLATION WORKING CORRECTLY!'}
+   {'✅ Complete user isolation confirmed' if isolation_working else '❌ User isolation has issues'}
+
+💡 CONCLUSION:
+"""
+            
+            if isolation_working:
+                details += """   ✅ The privacy fix is working correctly!
+   - Users can only see their own scans
+   - Cross-user access is properly blocked
+   - Database filtering by user_id is effective
+   - The reported issue may be frontend-related or resolved"""
+            else:
+                details += """   ❌ CRITICAL PRIVACY ISSUE CONFIRMED!
+   - Users can see each other's scans
+   - Cross-user access is not properly blocked
+   - Database filtering by user_id is failing
+   - This matches the user's reported issue"""
+            
+            test_status = "pass" if isolation_working else "fail"
+            self.log_test("user_isolation", test_status, details)
+            return isolation_working
+            
+        except requests.exceptions.Timeout:
+            self.log_test("user_isolation", "fail", 
+                        "Request timeout during user isolation tests")
+            return False
+        except requests.exceptions.RequestException as e:
+            self.log_test("user_isolation", "fail", f"Connection error: {str(e)}")
+            return False
+        except Exception as e:
+            self.log_test("user_isolation", "fail", f"Unexpected error: {str(e)}")
+            return False
+
     def test_individual_scan(self):
-        """Test 7: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
+        """Test 9: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
         try:
             print("\n🔍 Testing Individual Scan Retrieval...")
             
@@ -772,52 +971,6 @@ This resolves the privacy concerns with scan history access.
 Individual scan retrieved successfully!
 Scan ID: {data.get('id')}
 User ID: '{data.get('user_id')}'
-Item Name: {data.get('item_name', 'N/A')}
-Estimated Value: {data.get('estimated_value', 'N/A')}
-Confidence Score: {data.get('confidence_score', 'N/A')}%
-Has Image Data: {'Yes' if data.get('image_base64') else 'No'}
-Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
-"""
-                    self.log_test("individual_scan", "pass", details)
-                    return True
-                else:
-                    self.log_test("individual_scan", "fail", 
-                                f"Scan ID mismatch. Expected: {self.scan_id}, Got: {data.get('id')}")
-                    return False
-            elif response.status_code == 404:
-                self.log_test("individual_scan", "fail", 
-                            f"Scan not found: {self.scan_id}")
-                return False
-            else:
-                self.log_test("individual_scan", "fail", 
-                            f"HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log_test("individual_scan", "fail", f"Connection error: {str(e)}")
-            return False
-        except Exception as e:
-            self.log_test("individual_scan", "fail", f"Unexpected error: {str(e)}")
-            return False
-        """Test 4: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
-        try:
-            print("\n🔍 Testing Individual Scan Retrieval...")
-            
-            if not self.scan_id:
-                self.log_test("individual_scan", "fail", 
-                            "No scan ID available from previous test")
-                return False
-            
-            response = requests.get(f"{API_BASE}/scan/{self.scan_id}", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Verify it's the same scan we created
-                if data.get('id') == self.scan_id:
-                    details = f"""
-Individual scan retrieved successfully!
-Scan ID: {data.get('id')}
 Item Name: {data.get('item_name', 'N/A')}
 Estimated Value: {data.get('estimated_value', 'N/A')}
 Confidence Score: {data.get('confidence_score', 'N/A')}%
