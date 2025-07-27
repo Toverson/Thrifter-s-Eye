@@ -105,18 +105,46 @@ export class ScanService {
 
   static async getScanById(scanId) {
     try {
-      const scanDoc = await getDoc(doc(db, 'scans', scanId));
+      console.log('🔄 ScanService: getScanById called - USING BACKEND API');
+      console.log('🔄 ScanService: Scan ID:', scanId);
 
-      if (scanDoc.exists()) {
-        return {
-          id: scanDoc.id,
-          ...scanDoc.data(),
-          timestamp: scanDoc.data().timestamp?.toDate() || new Date(),
-        };
+      // Use backend API instead of Firestore
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/scan/${scanId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log('❌ ScanService: Scan not found');
+          return null;
+        }
+        throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
       }
-      return null;
+
+      const scan = await response.json();
+      console.log('✅ ScanService: Retrieved scan by ID from backend API');
+
+      // Convert backend format to frontend format
+      return {
+        id: scan.id,
+        itemName: scan.item_name,
+        estimatedValue: scan.estimated_value,
+        confidenceScore: scan.confidence_score,
+        aiAnalysis: scan.ai_analysis,
+        listingDraft: scan.listing_draft,
+        similarListings: scan.similar_listings,
+        imageBase64: scan.image_base64,
+        countryCode: scan.country_code,
+        currencyCode: scan.currency_code,
+        timestamp: new Date(scan.timestamp),
+        userId: scan.user_id
+      };
     } catch (error) {
-      console.error('Error getting scan by ID:', error);
+      console.error('❌ ScanService: Error getting scan by ID from backend API:', error);
       return null;
     }
   }
