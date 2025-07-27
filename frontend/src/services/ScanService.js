@@ -109,12 +109,18 @@ export class ScanService {
 
   static async getScanById(scanId) {
     try {
-      console.log('🔄 ScanService: getScanById called - USING BACKEND API');
+      const user = auth.currentUser;
+      console.log('🔄 ScanService: getScanById called - USING BACKEND API WITH USER CHECK');
       console.log('🔄 ScanService: Scan ID:', scanId);
+      console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
 
-      // Use backend API instead of Firestore
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Use backend API with optional user check
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/scan/${scanId}`, {
+      const response = await fetch(`${backendUrl}/api/scan/${scanId}?user_id=${encodeURIComponent(user.uid)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -126,11 +132,15 @@ export class ScanService {
           console.log('❌ ScanService: Scan not found');
           return null;
         }
+        if (response.status === 403) {
+          console.log('❌ ScanService: Access denied - scan belongs to another user');
+          return null;
+        }
         throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
       }
 
       const scan = await response.json();
-      console.log('✅ ScanService: Retrieved scan by ID from backend API');
+      console.log('✅ ScanService: Retrieved scan by ID from backend API for user:', user.uid);
 
       // Convert backend format to frontend format
       return {
