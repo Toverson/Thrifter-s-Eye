@@ -437,12 +437,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Firebase Anonymous Authentication - CRITICAL BLOCKER (authentication preventing all app access)"
-    - "Scan History Display - DEBUG (after auth fixed, focus on frontend retrieval logic)"
-    - "Theme System - TEST (verify toggle and persistence after auth fixed)"
-  stuck_tasks:
-    - "Firebase Anonymous Authentication"
-    - "Scan History Functionality"
+    - "Theme System - TEST (verify toggle and persistence)"
+    - "Settings Screen - Subscription Management (verify button functionality)" 
+    - "Complete end-to-end testing of scanning flow (camera → analysis → results → history)"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
