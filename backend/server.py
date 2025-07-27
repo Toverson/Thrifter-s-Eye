@@ -45,7 +45,7 @@ except Exception as e:
 # Models
 class ScanResult(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str = "prototype_user_01"
+    user_id: str  # Remove default, will be set from request
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     image_base64: str
     item_name: str
