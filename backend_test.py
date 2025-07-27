@@ -768,7 +768,14 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         # Test 1: Health Check
         health_ok = self.test_health_check()
         
-        # Test 2: Scan Endpoint (only if health check passes)
+        # Test 2A: CRITICAL - userId Validation (only if health check passes)
+        userid_validation_ok = False
+        if health_ok:
+            userid_validation_ok = self.test_scan_endpoint_userid_validation()
+        else:
+            self.log_test("scan_userid_validation", "skip", "Skipped due to health check failure")
+        
+        # Test 2B: Full AI Pipeline Scan (only if health check passes)
         scan_ok = False
         if health_ok:
             scan_ok = self.test_scan_endpoint()
@@ -804,6 +811,7 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         
         return {
             "health_check": health_ok,
+            "scan_userid_validation": userid_validation_ok,
             "scan_endpoint": scan_ok,
             "backend_logs": logs_ok,
             "history_endpoint": history_ok,
