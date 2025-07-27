@@ -401,7 +401,8 @@ Similar Listings Count: {len(data.get('similar_listings', []))}
             payload = {
                 "imageBase64": test_image_base64,
                 "countryCode": "US",
-                "currencyCode": "USD"
+                "currencyCode": "USD",
+                "userId": "backend_test_cycle_user"  # Required for privacy fix
             }
             
             scan_response = requests.post(
