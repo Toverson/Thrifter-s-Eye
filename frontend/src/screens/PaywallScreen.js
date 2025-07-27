@@ -105,11 +105,30 @@ export default function PaywallScreen() {
         <div className={`${theme.colors.surface} rounded-lg shadow-xl p-8 mb-8 ${theme.colors.border} border`}>
           <div className="text-center mb-8">
             <h3 className={`text-2xl font-bold ${theme.colors.text} mb-2`}>Thrifter's Eye Pro</h3>
-            <div className="flex items-baseline justify-center">
-              <span className="text-4xl font-bold text-green-600">$4.99</span>
-              <span className={`text-lg ${theme.colors.textSecondary} ml-2`}>/month</span>
-            </div>
-            <p className={`text-sm ${theme.colors.textMuted} mt-2`}>Cancel anytime</p>
+            
+            {loading ? (
+              <div className="flex items-baseline justify-center">
+                <div className="animate-pulse bg-gray-300 h-10 w-24 rounded"></div>
+                <span className={`text-lg ${theme.colors.textSecondary} ml-2`}>/month</span>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-baseline justify-center">
+                  <span className="text-4xl font-bold text-green-600">{pricing.formatted}</span>
+                  <span className={`text-lg ${theme.colors.textSecondary} ml-2`}>/month</span>
+                </div>
+                
+                {pricing.currencyCode !== 'CAD' && (
+                  <p className={`text-sm ${theme.colors.textMuted} mt-1`}>
+                    Original price: {pricing.originalCAD} CAD/month
+                  </p>
+                )}
+                
+                <p className={`text-sm ${theme.colors.textMuted} mt-2`}>
+                  Cancel anytime • {pricing.currencyCode}
+                </p>
+              </>
+            )}
           </div>
 
           {/* Features List */}
