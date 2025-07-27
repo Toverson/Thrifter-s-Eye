@@ -292,6 +292,9 @@ async def scan_item(request: ScanRequest):
         
         return scan_result
         
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 400 for missing userId) without modification
+        raise
     except Exception as e:
         logging.error(f"Scan error: {e}")
         raise HTTPException(status_code=500, detail=f"Scan failed: {str(e)}")
