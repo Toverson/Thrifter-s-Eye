@@ -21,7 +21,7 @@ export default function PaywallScreen() {
       const user = auth.currentUser;
       if (user) {
         await UserService.updateProStatus(user.uid, true);
-        alert('Pro upgrade successful! (This is a web demo - in the real app, this would use RevenueCat)');
+        alert('Pro upgrade successful! Welcome to Thrifter\'s Eye Pro!');
         navigate('/');
       }
     } catch (error) {
