@@ -224,7 +224,7 @@ This resolves the reported scanning failures after privacy fixes.
                 # Convert image to base64
                 with open(test_image_path, 'rb') as f:
                     image_data = f.read()
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    test_image_base64 = base64.b64encode(image_data).decode('utf-8')
             
             # Prepare JSON payload as expected by frontend
             payload = {
