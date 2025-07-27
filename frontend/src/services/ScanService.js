@@ -161,5 +161,43 @@ export class ScanService {
       console.error('❌ ScanService: Error getting scan by ID from backend API:', error);
       return null;
     }
+  static async clearUserHistory() {
+    try {
+      const user = auth.currentUser;
+      console.log('🔄 ScanService: clearUserHistory called');
+      console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      console.log('🔄 ScanService: Clearing user history via backend API DELETE /api/history');
+
+      // Use backend API to clear user history
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/history?user_id=${encodeURIComponent(user.uid)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ ScanService: Cleared', result.deleted_count, 'scans from history');
+      console.log('✅ ScanService: Clear history result:', result);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ ScanService: Error clearing user history:', error);
+      console.error('❌ ScanService: Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
   }
 }
