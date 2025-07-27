@@ -95,7 +95,8 @@ class ThrifterEyeBackendTester:
             payload = {
                 "imageBase64": image_base64,
                 "countryCode": "CA",  # Test with Canada to verify country_code parameter
-                "currencyCode": "CAD"
+                "currencyCode": "CAD",
+                "userId": "backend_test_user"  # Required for privacy fix
             }
             
             print("Sending JSON request with base64 image and processing with AI pipeline...")
