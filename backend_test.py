@@ -208,27 +208,119 @@ Similar Listings Count: {len(data.get('similar_listings', []))}
             return False
 
     def test_history_endpoint(self):
-        """Test 3: History Retrieval - GET /api/history"""
+        """Test 3: SCAN HISTORY DEBUGGING - Detailed Database Analysis"""
         try:
-            print("\n🔍 Testing History Endpoint...")
+            print("\n🔍 DEBUGGING SCAN HISTORY ISSUE - Analyzing Database Content...")
+            print("🎯 FOCUS: Understanding why frontend shows 'No scans yet' despite scans existing")
+            
             response = requests.get(f"{API_BASE}/history", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
                 
                 if isinstance(data, list):
+                    # DETAILED ANALYSIS FOR DEBUGGING
+                    total_scans = len(data)
+                    
                     details = f"""
-History retrieved successfully!
-Total scans in history: {len(data)}
+🔍 SCAN HISTORY DEBUGGING RESULTS:
+=====================================
+
+📊 TOTAL SCANS IN DATABASE: {total_scans}
+
+🔑 KEY FINDINGS:
 """
-                    if len(data) > 0:
-                        latest_scan = data[0]
+                    
+                    if total_scans == 0:
+                        details += """
+❌ NO SCANS FOUND IN DATABASE
+- This explains why frontend shows 'No scans yet'
+- Issue: Scans are not being saved to database at all
+- Recommendation: Check if POST /api/scan is actually saving to database
+"""
+                    else:
+                        # Analyze scan structure and user IDs
+                        user_ids = set()
+                        scan_structures = []
+                        
+                        for i, scan in enumerate(data[:5]):  # Analyze first 5 scans
+                            user_id = scan.get('user_id', 'MISSING')
+                            user_ids.add(user_id)
+                            
+                            scan_structure = {
+                                'id': scan.get('id', 'MISSING'),
+                                'user_id': user_id,
+                                'timestamp': scan.get('timestamp', 'MISSING'),
+                                'item_name': scan.get('item_name', 'MISSING'),
+                                'has_image': bool(scan.get('image_base64')),
+                                'country_code': scan.get('country_code', 'MISSING'),
+                                'currency_code': scan.get('currency_code', 'MISSING')
+                            }
+                            scan_structures.append(scan_structure)
+                        
                         details += f"""
-Latest scan details:
-- ID: {latest_scan.get('id', 'N/A')}
-- Item: {latest_scan.get('item_name', 'N/A')}
-- Value: {latest_scan.get('estimated_value', 'N/A')}
-- Timestamp: {latest_scan.get('timestamp', 'N/A')}
+✅ SCANS FOUND: {total_scans} scans exist in database
+
+👥 USER IDs IN DATABASE:
+{chr(10).join([f"   - '{uid}'" for uid in sorted(user_ids)])}
+
+📋 SAMPLE SCAN STRUCTURES (First 5 scans):
+"""
+                        for i, structure in enumerate(scan_structures, 1):
+                            details += f"""
+   Scan #{i}:
+   - ID: {structure['id']}
+   - User ID: '{structure['user_id']}'
+   - Timestamp: {structure['timestamp']}
+   - Item: {structure['item_name']}
+   - Has Image: {structure['has_image']}
+   - Country/Currency: {structure['country_code']}/{structure['currency_code']}
+"""
+                        
+                        # Latest scan details
+                        if data:
+                            latest = data[0]
+                            details += f"""
+🕐 LATEST SCAN DETAILS:
+   - ID: {latest.get('id')}
+   - User ID: '{latest.get('user_id')}'
+   - Item: {latest.get('item_name')}
+   - Value: {latest.get('estimated_value')}
+   - Timestamp: {latest.get('timestamp')}
+   - Country/Currency: {latest.get('country_code')}/{latest.get('currency_code')}
+
+🔍 POTENTIAL ISSUES ANALYSIS:
+"""
+                            # Check for common issues
+                            if latest.get('user_id') != 'prototype_user_01':
+                                details += f"   ⚠️  USER ID MISMATCH: Expected 'prototype_user_01', found '{latest.get('user_id')}'\n"
+                            else:
+                                details += f"   ✅ USER ID CORRECT: Using expected 'prototype_user_01'\n"
+                            
+                            if not latest.get('image_base64'):
+                                details += f"   ⚠️  MISSING IMAGE DATA: Scan has no image_base64 field\n"
+                            else:
+                                details += f"   ✅ IMAGE DATA PRESENT: Scan contains image data\n"
+                            
+                            if not latest.get('timestamp'):
+                                details += f"   ⚠️  MISSING TIMESTAMP: Scan has no timestamp field\n"
+                            else:
+                                details += f"   ✅ TIMESTAMP PRESENT: {latest.get('timestamp')}\n"
+                        
+                        details += f"""
+🎯 CONCLUSION:
+   - Database contains {total_scans} scans with proper structure
+   - All scans use user_id: '{list(user_ids)[0] if len(user_ids) == 1 else 'MULTIPLE_IDS'}'
+   - If frontend shows 'No scans yet', the issue is likely:
+     1. Frontend authentication using different user ID
+     2. Frontend query logic error
+     3. Firestore security rules (if using Firestore)
+     4. Authentication timing issues
+
+💡 NEXT STEPS:
+   - Check what user ID the frontend is using for queries
+   - Verify frontend authentication state
+   - Compare frontend query logic with backend filtering
 """
                     
                     self.log_test("history_endpoint", "pass", details)
