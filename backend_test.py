@@ -37,7 +37,8 @@ class ThrifterEyeBackendTester:
             "history_endpoint": {"status": "pending", "details": ""},
             "scan_save_retrieve": {"status": "pending", "details": ""},
             "user_isolation": {"status": "pending", "details": ""},
-            "individual_scan": {"status": "pending", "details": ""}
+            "individual_scan": {"status": "pending", "details": ""},
+            "delete_history": {"status": "pending", "details": ""}
         }
         self.scan_id = None
         
