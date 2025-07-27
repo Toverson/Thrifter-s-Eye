@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
-import { LogBox } from 'react-native';
+import { LogBox, StatusBar } from 'react-native';
 import Purchases from 'react-native-purchases';
 
 // Screens
@@ -16,6 +16,9 @@ import SettingsScreen from './src/screens/SettingsScreen';
 
 // Services
 import { UserService } from './src/services/UserService';
+
+// Theme Provider
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 
