@@ -133,61 +133,17 @@ export default function SettingsScreen() {
           </div>
         </div>
 
-        {/* Account Protection */}
-        {isAnonymous && (
-          <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-6 border ${theme.colors.border}`}>
-            <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>Protect Your Scans</h2>
-            <p className={`${theme.colors.textSecondary} mb-6`}>
-              Create a permanent account to protect your scan history and subscription across devices.
-            </p>
-            
-            <div className="space-y-3">
-              <button
-                onClick={linkWithEmailPassword}
-                disabled={loading}
-                className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
-              >
-                📧 Link with Email & Password
-              </button>
-              
-              <button
-                onClick={linkWithGoogle}
-                disabled={loading}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50"
-              >
-                🔗 Link with Google
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Subscription Management */}
         <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 mb-6 border ${theme.colors.border}`}>
           <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>Subscription</h2>
           
-          <div className="space-y-3">
-            <button
-              onClick={simulateManageSubscriptions}
-              disabled={loading}
-              className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
-            >
-              ⚙️ Manage Subscription
-            </button>
-            
-            <button
-              onClick={simulateRestorePurchases}
-              disabled={loading}
-              className={`w-full ${theme.colors.success} text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
-            >
-              🔄 Restore Purchases (Demo)
-            </button>
-          </div>
-          
-          <p className={`${theme.colors.textSecondary} text-sm mt-4`}>
-            <strong>iOS App Behavior:</strong><br/>
-            • "Manage Subscription" opens your device's Apple ID subscription management<br/>
-            • "Restore Purchases" syncs your subscription status with RevenueCat
-          </p>
+          <button
+            onClick={simulateManageSubscriptions}
+            disabled={loading}
+            className={`w-full ${theme.colors.primary} ${theme.colors.primaryText} font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-50`}
+          >
+            ⚙️ Manage Subscription
+          </button>
         </div>
 
         {/* Web Testing Info */}
