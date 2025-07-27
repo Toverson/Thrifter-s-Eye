@@ -196,7 +196,7 @@ The privacy fix is working correctly. POST /api/scan now properly:
 This resolves the reported scanning failures after privacy fixes.
 """
             
-            self.log_test("scan_endpoint", "pass", details)
+            self.log_test("scan_userid_validation", "pass", details)
             return True
                 
         except requests.exceptions.Timeout:
