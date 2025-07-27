@@ -61,6 +61,7 @@ export default function LoadingScreen() {
 
       // Call the cloud function to analyze the image
       console.log('🔄 LoadingScreen: Calling CloudFunctionService with userId:', user.uid);
+      console.log('🔄 LoadingScreen: About to make SINGLE scan request');
       const result = await CloudFunctionService.scanItem(
         imageBase64,
         userLocation?.countryCode || 'US',
@@ -68,6 +69,7 @@ export default function LoadingScreen() {
         user.uid  // Pass the user ID for privacy compliance
       );
       console.log('✅ LoadingScreen: CloudFunctionService completed');
+      console.log('✅ LoadingScreen: Received scan result with ID:', result.id);
 
       // Increment user's scan count (for free users)
       console.log('🔄 LoadingScreen: Getting user data');
