@@ -621,6 +621,7 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
             "scan_endpoint": scan_ok,
             "backend_logs": logs_ok,
             "history_endpoint": history_ok,
+            "scan_save_retrieve": save_retrieve_ok,
             "individual_scan": individual_ok
         }
 
