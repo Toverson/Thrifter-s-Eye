@@ -45,17 +45,22 @@ export default function LoadingScreen() {
   const processImage = async () => {
     try {
       const user = auth.currentUser;
+      console.log('🔄 LoadingScreen: Starting image processing');
+      console.log('📍 LoadingScreen: Auth state check - currentUser:', user);
+      
       if (!user) {
+        console.error('❌ LoadingScreen: No authenticated user found');
         navigate('/login');
         return;
       }
-
-      console.log('🔄 LoadingScreen: Starting image processing');
+      
+      console.log('✅ LoadingScreen: User authenticated');
       console.log('📍 LoadingScreen: User ID:', user.uid);
+      console.log('📍 LoadingScreen: User isAnonymous:', user.isAnonymous);
       console.log('📍 LoadingScreen: Location:', userLocation);
 
       // Call the cloud function to analyze the image
-      console.log('🔄 LoadingScreen: Calling CloudFunctionService');
+      console.log('🔄 LoadingScreen: Calling CloudFunctionService with userId:', user.uid);
       const result = await CloudFunctionService.scanItem(
         imageBase64,
         userLocation?.countryCode || 'US',
