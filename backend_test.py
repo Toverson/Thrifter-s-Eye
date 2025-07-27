@@ -33,6 +33,7 @@ class ThrifterEyeBackendTester:
             "scan_endpoint": {"status": "pending", "details": ""},
             "backend_logs": {"status": "pending", "details": ""},
             "history_endpoint": {"status": "pending", "details": ""},
+            "scan_save_retrieve": {"status": "pending", "details": ""},
             "individual_scan": {"status": "pending", "details": ""}
         }
         self.scan_id = None
