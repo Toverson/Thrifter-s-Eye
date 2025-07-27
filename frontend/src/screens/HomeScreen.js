@@ -132,16 +132,29 @@ export default function HomeScreen() {
           </button>
         </div>
 
-        {/* Web testing info */}
+        {/* Enhanced Debug info for user isolation testing */}
         <div className="mt-12 max-w-2xl mx-auto">
           <div className={`${theme.colors.surface} ${theme.colors.border} border rounded-lg p-4`}>
-            <h3 className={`font-bold ${theme.colors.text} mb-2`}>Web Testing Mode</h3>
-            <p className={`${theme.colors.textSecondary} text-sm`}>
-              You're now using anonymous authentication - the same flow as the iOS app. 
-              Your session ID: <code className={`${theme.colors.surface} bg-opacity-20 px-1 rounded text-xs`}>
-                {auth.currentUser?.uid?.substr(0, 8)}...
-              </code>
-            </p>
+            <h3 className={`font-bold ${theme.colors.text} mb-2`}>Debug Information:</h3>
+            <div className={`${theme.colors.textSecondary} text-sm space-y-1`}>
+              <p>
+                <strong>User ID:</strong> {auth.currentUser?.uid?.substring(0, 8)}...{auth.currentUser?.uid?.substring(auth.currentUser?.uid?.length - 4)}
+              </p>
+              <p>
+                <strong>Full User ID:</strong> <code className={`${theme.colors.surface} bg-opacity-20 px-1 rounded text-xs`}>
+                  {auth.currentUser?.uid}
+                </code>
+              </p>
+              <p>
+                <strong>Is Anonymous:</strong> {auth.currentUser?.isAnonymous ? 'Yes' : 'No'}
+              </p>
+              <p>
+                <strong>Auth Provider:</strong> {auth.currentUser?.providerData?.length > 0 ? auth.currentUser.providerData[0].providerId : 'Anonymous'}
+              </p>
+              <p>
+                <strong>Session Time:</strong> {new Date().toLocaleTimeString()}
+              </p>
+            </div>
           </div>
         </div>
       </div>
