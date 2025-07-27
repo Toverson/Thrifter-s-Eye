@@ -315,11 +315,19 @@ async def scan_item_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"File scan failed: {str(e)}")
 
 @api_router.get("/history", response_model=List[ScanResult])
-async def get_scan_history():
+async def get_scan_history(user_id: Optional[str] = None):
     """Get scan history for the user"""
     try:
-        scans = await db.scans.find({"user_id": "prototype_user_01"}).sort("timestamp", -1).to_list(50)
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id parameter is required")
+        
+        logging.info(f"Fetching scan history for user: {user_id}")
+        scans = await db.scans.find({"user_id": user_id}).sort("timestamp", -1).to_list(50)
+        logging.info(f"Found {len(scans)} scans for user: {user_id}")
+        
         return [ScanResult(**scan) for scan in scans]
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"History error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get history: {str(e)}")
