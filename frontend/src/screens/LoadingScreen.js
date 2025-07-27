@@ -27,8 +27,16 @@ export default function LoadingScreen() {
       return;
     }
     
+    // Prevent double execution
+    if (processedRef.current) {
+      console.log('⚠️ LoadingScreen: processImage already called, skipping duplicate');
+      return;
+    }
+    
+    processedRef.current = true;
+    console.log('🔄 LoadingScreen: Starting processImage (first time)');
     processImage();
-  }, [imageBase64, navigate]);
+  }, [imageBase64]); // Remove navigate from dependencies
 
   useEffect(() => {
     // Cycle through loading messages
