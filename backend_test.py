@@ -1047,7 +1047,14 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         else:
             self.log_test("scan_save_retrieve", "skip", "Skipped due to health check failure")
         
-        # Test 6: Individual Scan (only if scan was successful)
+        # Test 6: CRITICAL - User Isolation Test (only if health check passes)
+        user_isolation_ok = False
+        if health_ok:
+            user_isolation_ok = self.test_user_isolation_critical()
+        else:
+            self.log_test("user_isolation", "skip", "Skipped due to health check failure")
+        
+        # Test 7: Individual Scan (only if scan was successful)
         individual_ok = False
         if scan_ok or save_retrieve_ok:  # Can use scan ID from either test
             individual_ok = self.test_individual_scan()
@@ -1065,6 +1072,7 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
             "history_userid_validation": history_userid_validation_ok,
             "history_endpoint": history_ok,
             "scan_save_retrieve": save_retrieve_ok,
+            "user_isolation": user_isolation_ok,
             "individual_scan": individual_ok
         }
 
