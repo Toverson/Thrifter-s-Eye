@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
-import { signInAnonymously, signOut } from 'firebase/auth';
 import { UserService } from '../services/UserService';
 import { LocationService } from '../services/LocationService';
 import { useTheme } from '../contexts/ThemeContext';
