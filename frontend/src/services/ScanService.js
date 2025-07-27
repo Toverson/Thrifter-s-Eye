@@ -1,34 +1,44 @@
-import { collection, addDoc, query, where, orderBy, limit, getDocs, doc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { auth } from '../firebase';
 
 export class ScanService {
   static async saveScan(scanData) {
     try {
       const user = auth.currentUser;
-      console.log('🔄 ScanService: saveScan called');
+      console.log('🔄 ScanService: saveScan called - USING BACKEND API');
       console.log('🔄 ScanService: Current user:', user ? user.uid : 'No user');
       
       if (!user) {
         throw new Error('User not authenticated');
       }
 
-      const scanWithUser = {
-        ...scanData,
-        userId: user.uid,
-        timestamp: serverTimestamp(),
-      };
+      console.log('🔄 ScanService: Using backend API POST /api/scan');
+      console.log('🔄 ScanService: Scan data keys:', Object.keys(scanData));
 
-      console.log('🔄 ScanService: Preparing to save scan with userId:', user.uid);
-      console.log('🔄 ScanService: Scan data keys:', Object.keys(scanWithUser));
+      // Use backend API instead of direct Firestore
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/scan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageBase64: scanData.imageBase64,
+          countryCode: scanData.countryCode || 'US',
+          currencyCode: scanData.currencyCode || 'USD'
+        }),
+      });
 
-      const docRef = await addDoc(collection(db, 'scans'), scanWithUser);
-      console.log('✅ ScanService: Scan saved successfully with ID:', docRef.id);
+      if (!response.ok) {
+        throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ ScanService: Scan saved successfully via backend API with ID:', result.id);
       
-      return docRef.id;
+      return result.id;
     } catch (error) {
-      console.error('❌ ScanService: Error saving scan:', error);
+      console.error('❌ ScanService: Error saving scan via backend API:', error);
       console.error('❌ ScanService: Error details:', {
-        code: error.code,
         message: error.message,
         stack: error.stack
       });
