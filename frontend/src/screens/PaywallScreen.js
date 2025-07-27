@@ -30,6 +30,39 @@ export default function PaywallScreen() {
     }
   };
 
+  // Load user's location and calculate pricing
+  useEffect(() => {
+    const loadPricing = async () => {
+      try {
+        console.log('💰 PaywallScreen: Loading user location for pricing...');
+        
+        // Get user's location
+        const userLocation = await LocationService.getCurrentLocation();
+        console.log('📍 PaywallScreen: User location:', userLocation);
+        
+        // Get user's currency
+        const userCurrency = CurrencyService.getUserCurrency(userLocation);
+        console.log('💰 PaywallScreen: User currency:', userCurrency);
+        
+        // Convert price to user's currency
+        const convertedPricing = CurrencyService.convertPrice(userCurrency);
+        console.log('💰 PaywallScreen: Converted pricing:', convertedPricing);
+        
+        setPricing(convertedPricing);
+      } catch (error) {
+        console.error('❌ PaywallScreen: Error loading pricing:', error);
+        
+        // Fallback to USD pricing
+        const fallbackPricing = CurrencyService.convertPrice('USD');
+        setPricing(fallbackPricing);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPricing();
+  }, []);
+
   const features = [
     '📷 Unlimited item scans',
     '💎 Premium AI analysis',
