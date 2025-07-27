@@ -1317,7 +1317,8 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
             "history_endpoint": history_ok,
             "scan_save_retrieve": save_retrieve_ok,
             "user_isolation": user_isolation_ok,
-            "individual_scan": individual_ok
+            "individual_scan": individual_ok,
+            "delete_history": delete_history_ok
         }
 
     def print_final_summary(self):
