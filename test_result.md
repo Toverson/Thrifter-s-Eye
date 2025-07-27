@@ -395,6 +395,9 @@ frontend:
       - working: false
         agent: "main"
         comment: "❌ DEBUGGING: Enhanced ScanService and HistoryScreen with comprehensive logging. Updated HistoryScreen to wait for authentication completion before loading scans. Added detailed error handling to identify if issue is with Firestore writes, security rules, or authentication timing. Currently investigating if scan saving is failing silently."
+      - working: false
+        agent: "main"
+        comment: "❌ INVESTIGATION: User confirmed that scans are being saved to database correctly. The issue is with the frontend HistoryScreen not displaying the saved scans. Authentication is failing (showing 'Authentication Required' screen) which prevents scan history from loading. Root cause appears to be authentication regression blocking the entire history display functionality."
 
   - task: "Home Screen Theme Integration"
     implemented: true
