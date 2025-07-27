@@ -123,6 +123,9 @@ export default function LoadingScreen() {
     } catch (error) {
       console.error('❌ LoadingScreen: Processing error:', error);
       
+      // Reset the processed ref so user can try again
+      processedRef.current = false;
+      
       // More specific error messages
       let errorMessage = 'Failed to analyze image. Please try again.';
       
