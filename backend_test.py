@@ -526,6 +526,55 @@ Similar Listings Count: {len(data.get('similar_listings', []))}
         except Exception as e:
             self.log_test("scan_save_retrieve", "fail", f"Unexpected error: {str(e)}")
             return False
+
+    def test_individual_scan(self):
+        """Test 7: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
+        try:
+            print("\n🔍 Testing Individual Scan Retrieval...")
+            
+            if not self.scan_id:
+                self.log_test("individual_scan", "fail", 
+                            "No scan ID available from previous test")
+                return False
+            
+            response = requests.get(f"{API_BASE}/scan/{self.scan_id}", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify it's the same scan we created
+                if data.get('id') == self.scan_id:
+                    details = f"""
+Individual scan retrieved successfully!
+Scan ID: {data.get('id')}
+User ID: '{data.get('user_id')}'
+Item Name: {data.get('item_name', 'N/A')}
+Estimated Value: {data.get('estimated_value', 'N/A')}
+Confidence Score: {data.get('confidence_score', 'N/A')}%
+Has Image Data: {'Yes' if data.get('image_base64') else 'No'}
+Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
+"""
+                    self.log_test("individual_scan", "pass", details)
+                    return True
+                else:
+                    self.log_test("individual_scan", "fail", 
+                                f"Scan ID mismatch. Expected: {self.scan_id}, Got: {data.get('id')}")
+                    return False
+            elif response.status_code == 404:
+                self.log_test("individual_scan", "fail", 
+                            f"Scan not found: {self.scan_id}")
+                return False
+            else:
+                self.log_test("individual_scan", "fail", 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("individual_scan", "fail", f"Connection error: {str(e)}")
+            return False
+        except Exception as e:
+            self.log_test("individual_scan", "fail", f"Unexpected error: {str(e)}")
+            return False
         """Test 4: Individual Scan Retrieval - GET /api/scan/{scan_id}"""
         try:
             print("\n🔍 Testing Individual Scan Retrieval...")
