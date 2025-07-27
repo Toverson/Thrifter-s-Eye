@@ -215,19 +215,6 @@ export default function SettingsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
   backButton: {
     padding: 5,
   },
@@ -236,108 +223,7 @@ const styles = StyleSheet.create({
     color: '#667eea',
     fontWeight: '600',
   },
-  headerTitle: {
-    flex: 1,
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginRight: 50,
-  },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-  },
-  section: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  sectionDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 15,
-    lineHeight: 20,
-  },
-  accountCard: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 8,
-  },
-  accountType: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  accountDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 10,
-  },
-  userId: {
-    fontSize: 12,
-    color: '#999',
-    fontFamily: 'monospace',
-  },
-  primaryButton: {
-    backgroundColor: '#667eea',
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  primaryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  googleButton: {
-    backgroundColor: '#db4437',
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  googleButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  restoreButton: {
-    backgroundColor: '#28a745',
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginBottom: 10,
-  },
-  restoreButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  restoreDescription: {
-    fontSize: 12,
-    color: '#666',
-    lineHeight: 16,
-  },
-  appInfo: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
   },
 });
