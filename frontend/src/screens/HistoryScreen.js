@@ -138,13 +138,39 @@ export default function HistoryScreen() {
               ))}
             </div>
 
-            {/* Refresh button */}
-            <div className="text-center mt-8">
+            {/* Action buttons */}
+            <div className="flex justify-center items-center space-x-6 mt-8">
               <button
                 onClick={loadScans}
                 className="text-purple-600 hover:text-purple-800 font-semibold"
               >
                 🔄 Refresh
+              </button>
+              
+              <button
+                onClick={async () => {
+                  if (!window.confirm('Are you sure you want to clear all scan history? This action cannot be undone.')) {
+                    return;
+                  }
+                  
+                  try {
+                    console.log('🗑️ Clearing scan history...');
+                    const result = await ScanService.clearUserHistory();
+                    console.log('✅ Scan history cleared:', result);
+                    
+                    // Show success message
+                    alert(`Successfully cleared ${result.deleted_count} scans from your history.`);
+                    
+                    // Reload the history to show empty state
+                    await loadScans();
+                  } catch (error) {
+                    console.error('❌ Failed to clear history:', error);
+                    alert('Failed to clear scan history. Please try again.');
+                  }
+                }}
+                className="text-red-600 hover:text-red-800 font-semibold"
+              >
+                🗑️ Clear History
               </button>
             </div>
           </div>
