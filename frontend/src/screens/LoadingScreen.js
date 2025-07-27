@@ -12,6 +12,7 @@ export default function LoadingScreen() {
   const { theme } = useTheme();
   const { imageBase64, imagePreview, location: userLocation } = location.state || {};
   const [loadingMessage, setLoadingMessage] = useState('Identifying object...');
+  const processedRef = useRef(false); // Prevent double processing
 
   const loadingMessages = [
     'Identifying object...',
