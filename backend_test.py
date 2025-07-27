@@ -215,7 +215,7 @@ Similar Listings Count: {len(data.get('similar_listings', []))}
             print("\n🔍 DEBUGGING SCAN HISTORY ISSUE - Analyzing Database Content...")
             print("🎯 FOCUS: Understanding why frontend shows 'No scans yet' despite scans existing")
             
-            response = requests.get(f"{API_BASE}/history", timeout=10)
+            response = requests.get(f"{API_BASE}/history?user_id=backend_test_cycle_user", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
