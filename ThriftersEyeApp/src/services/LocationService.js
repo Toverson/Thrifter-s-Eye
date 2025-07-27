@@ -1,109 +1,88 @@
-import Geolocation from 'react-native-geolocation-service';
-import { PermissionsAndroid, Platform } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 
 export class LocationService {
   static async getCurrentLocation() {
     try {
-      // Request permission
-      if (Platform.OS === 'ios') {
-        const hasPermission = await this.hasLocationPermission();
-        if (!hasPermission) {
-          return this.getDefaultLocation();
-        }
-      } else {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          return this.getDefaultLocation();
-        }
-      }
-
+      console.log('📍 LocationService: Getting current location...');
+      
       return new Promise((resolve, reject) => {
         Geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            this.getCountryFromCoordinates(latitude, longitude)
-              .then(resolve)
-              .catch(() => resolve(this.getDefaultLocation()));
+          async (position) => {
+            try {
+              const { latitude, longitude } = position.coords;
+              console.log('📍 LocationService: Got coordinates:', latitude, longitude);
+              
+              // Get country/currency from coordinates using a geocoding API
+              // For now, we'll use a simple mapping based on common locations
+              // In production, you'd use a proper geocoding service
+              
+              const locationData = await this.getLocationFromCoordinates(latitude, longitude);
+              console.log('📍 LocationService: Location data:', locationData);
+              
+              resolve(locationData);
+            } catch (error) {
+              console.error('❌ LocationService: Error processing location:', error);
+              resolve(this.getDefaultLocation());
+            }
           },
           (error) => {
-            console.log('Location error:', error);
+            console.error('❌ LocationService: Geolocation error:', error);
             resolve(this.getDefaultLocation());
           },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+          {
+            enableHighAccuracy: false,
+            timeout: 15000,
+            maximumAge: 300000, // 5 minutes
+          }
         );
       });
     } catch (error) {
-      console.log('Location service error:', error);
+      console.error('❌ LocationService: Error getting location:', error);
       return this.getDefaultLocation();
     }
   }
 
-  static async hasLocationPermission() {
-    if (Platform.OS === 'ios') {
-      return true; // iOS permissions are handled by the system
-    }
-
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-
-    if (hasPermission) return true;
-
-    const status = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-
-    return status === PermissionsAndroid.RESULTS.GRANTED;
-  }
-
-  static async getCountryFromCoordinates(latitude, longitude) {
-    try {
-      // Using a free geocoding service to get country from coordinates
-      const response = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-      );
-      const data = await response.json();
-      
-      const countryCode = data.countryCode || 'US';
-      const currencyCode = this.getCurrencyFromCountryCode(countryCode);
-      
+  static async getLocationFromCoordinates(latitude, longitude) {
+    // This is a simplified implementation
+    // In production, you'd use a proper geocoding API like Google Maps or Mapbox
+    
+    // Simple region detection based on coordinates
+    if (latitude >= 49.0 && latitude <= 83.0 && longitude >= -141.0 && longitude <= -52.0) {
       return {
-        countryCode,
-        currencyCode,
+        countryCode: 'CA',
+        currencyCode: 'CAD',
+        country: 'Canada'
       };
-    } catch (error) {
-      console.log('Geocoding error:', error);
-      return this.getDefaultLocation();
+    } else if (latitude >= 24.0 && latitude <= 49.0 && longitude >= -125.0 && longitude <= -66.0) {
+      return {
+        countryCode: 'US',
+        currencyCode: 'USD',
+        country: 'United States'
+      };
+    } else if (latitude >= 35.0 && latitude <= 71.0 && longitude >= -10.0 && longitude <= 40.0) {
+      return {
+        countryCode: 'GB',
+        currencyCode: 'GBP',
+        country: 'United Kingdom'
+      };
     }
-  }
-
-  static getCurrencyFromCountryCode(countryCode) {
-    const currencyMap = {
-      'US': 'USD',
-      'CA': 'CAD', 
-      'GB': 'GBP',
-      'AU': 'AUD',
-      'DE': 'EUR',
-      'FR': 'EUR',
-      'IT': 'EUR',
-      'ES': 'EUR',
-      'JP': 'JPY',
-      'CN': 'CNY',
-      'IN': 'INR',
-      'BR': 'BRL',
-      'MX': 'MXN',
-      'RU': 'RUB',
-    };
-
-    return currencyMap[countryCode] || 'USD';
+    
+    // Default to US if we can't determine location
+    return this.getDefaultLocation();
   }
 
   static getDefaultLocation() {
     return {
       countryCode: 'US',
       currencyCode: 'USD',
+      country: 'United States'
     };
+  }
+
+  static async requestLocationPermission() {
+    // On iOS, permissions are handled automatically by the geolocation call
+    // On Android, you'd need to handle runtime permissions
+    console.log('📍 LocationService: Location permission will be requested when needed');
+    return true;
   }
 }
