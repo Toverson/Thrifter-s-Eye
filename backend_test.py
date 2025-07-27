@@ -421,7 +421,7 @@ The privacy fix is working correctly. GET /api/history now properly:
 This resolves the privacy concerns with scan history access.
 """
             
-            self.log_test("history_endpoint", "pass", details)
+            self.log_test("history_userid_validation", "pass", details)
             return True
                 
         except requests.exceptions.RequestException as e:
