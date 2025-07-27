@@ -7,199 +7,207 @@ import {
   SafeAreaView,
   Alert,
   ScrollView,
+  Switch,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import Purchases from 'react-native-purchases';
-import { UserService } from '../services/UserService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function SettingsScreen({ navigation }) {
+  const { theme, toggleTheme, isDark } = useTheme();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(auth().currentUser);
+  const [user] = useState(auth().currentUser);
 
-  const restorePurchases = async () => {
-    try {
-      setLoading(true);
-      
-      const customerInfo = await Purchases.restorePurchases();
-      
-      if (customerInfo.entitlements.active.Pro) {
-        // Update user status in Firestore
-        if (user) {
-          await UserService.updateProStatus(user.uid, true);
-        }
-        
-        Alert.alert(
-          'Restored!',
-          'Your Pro subscription has been restored.',
-          [{ text: 'OK' }]
-        );
-      } else {
-        Alert.alert('No Purchases', 'No active Pro subscription found.');
-      }
-    } catch (error) {
-      console.error('Restore error:', error);
-      Alert.alert('Error', 'Failed to restore purchases. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const linkWithEmailPassword = async () => {
-    Alert.prompt(
-      'Create Permanent Account',
-      'Enter your email and password to protect your scans:',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Create Account',
-          onPress: async (email) => {
-            Alert.prompt(
-              'Password',
-              'Enter a password:',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Link Account',
-                  onPress: async (password) => {
-                    await linkAccount('email', { email, password });
-                  }
-                }
-              ],
-              'secure-text'
-            );
-          }
-        }
-      ],
-      'plain-text'
+  const simulateManageSubscriptions = () => {
+    // In production, this calls: Purchases.showManageSubscriptions()
+    Alert.alert(
+      'Manage Subscriptions',
+      'This would open your device\'s subscription management screen.\n\nOn iOS: Settings → Apple ID → Subscriptions → Thrifter\'s Eye\n\nThis allows you to cancel, modify, or view your subscription details.'
     );
   };
 
-  const linkWithGoogle = async () => {
-    try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      const { idToken } = await GoogleSignin.signIn();
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      await linkAccount('google', googleCredential);
-    } catch (error) {
-      Alert.alert('Error', 'Google sign-in failed');
-    }
-  };
-
-  const linkAccount = async (provider, credentials) => {
-    try {
-      setLoading(true);
-      
-      if (provider === 'email') {
-        const credential = auth.EmailAuthProvider.credential(
-          credentials.email,
-          credentials.password
-        );
-        await user.linkWithCredential(credential);
-      } else if (provider === 'google') {
-        await user.linkWithCredential(credentials);
-      }
-      
-      Alert.alert(
-        'Account Linked!',
-        'Your anonymous account has been upgraded to a permanent account. Your scans and subscription are now protected.',
-        [{ text: 'OK' }]
-      );
-      
-      setUser(auth().currentUser);
-    } catch (error) {
-      console.error('Account linking error:', error);
-      Alert.alert('Error', 'Failed to link account. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const isAnonymous = user?.isAnonymous;
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 15,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerTitle: {
+      flex: 1,
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginRight: 50,
+      color: theme.colors.text,
+    },
+    section: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 12,
+      padding: 20,
+      marginVertical: 10,
+      marginHorizontal: 20,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.22,
+      shadowRadius: 2.22,
+      elevation: 3,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      marginBottom: 10,
+    },
+    accountCard: {
+      backgroundColor: theme.colors.backgroundTertiary,
+      padding: 15,
+      borderRadius: 8,
+    },
+    accountType: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      marginBottom: 5,
+    },
+    accountDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginBottom: 10,
+    },
+    userId: {
+      fontSize: 12,
+      color: theme.colors.textMuted,
+      fontFamily: 'monospace',
+    },
+    themeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    themeInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    themeIcon: {
+      fontSize: 24,
+      marginRight: 12,
+    },
+    themeTextContainer: {
+      flex: 1,
+    },
+    themeTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    themeSubtitle: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
+    },
+    primaryButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 15,
+      borderRadius: 25,
+      marginBottom: 10,
+    },
+    primaryButtonText: {
+      color: theme.colors.primaryText,
+      fontSize: 16,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    appInfo: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginBottom: 5,
+    },
+  });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={dynamicStyles.container}>
+      <View style={dynamicStyles.header}>
         <TouchableOpacity 
           style={styles.backButton} 
           onPress={() => navigation.goBack()}
         >
           <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={dynamicStyles.headerTitle}>Settings</Text>
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Account Status */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Status</Text>
-          <View style={styles.accountCard}>
-            <Text style={styles.accountType}>
-              {isAnonymous ? '👤 Anonymous Account' : '🔐 Permanent Account'}
-            </Text>
-            <Text style={styles.accountDescription}>
-              {isAnonymous 
-                ? 'Your data is saved locally but not backed up.'
-                : 'Your account is protected and backed up.'}
-            </Text>
-            <Text style={styles.userId}>User ID: {user?.uid?.substr(0, 8)}...</Text>
+        {/* Theme Toggle */}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Appearance</Text>
+          <View style={dynamicStyles.themeRow}>
+            <View style={dynamicStyles.themeInfo}>
+              <Text style={dynamicStyles.themeIcon}>{isDark ? '🌙' : '☀️'}</Text>
+              <View style={dynamicStyles.themeTextContainer}>
+                <Text style={dynamicStyles.themeTitle}>
+                  {isDark ? 'Dark Mode' : 'Light Mode'}
+                </Text>
+                <Text style={dynamicStyles.themeSubtitle}>
+                  Choose your preferred theme
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: '#767577', true: theme.colors.primary }}
+              thumbColor={isDark ? '#ffffff' : '#f4f3f4'}
+            />
           </View>
         </View>
 
-        {/* Account Protection */}
-        {isAnonymous && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Protect Your Scans</Text>
-            <Text style={styles.sectionDescription}>
-              Create a permanent account to protect your scan history and subscription across devices.
+        {/* Account Status */}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Account Status</Text>
+          <View style={dynamicStyles.accountCard}>
+            <Text style={dynamicStyles.accountType}>
+              👤 Anonymous Account
             </Text>
-            
-            <TouchableOpacity 
-              style={styles.primaryButton}
-              onPress={linkWithEmailPassword}
-              disabled={loading}
-            >
-              <Text style={styles.primaryButtonText}>
-                📧 Link with Email & Password
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.googleButton}
-              onPress={linkWithGoogle}
-              disabled={loading}
-            >
-              <Text style={styles.googleButtonText}>
-                🔗 Link with Google
-              </Text>
-            </TouchableOpacity>
+            <Text style={dynamicStyles.accountDescription}>
+              Your scan history is private and secure
+            </Text>
+            <Text style={dynamicStyles.userId}>Session ID: {user?.uid?.substr(0, 8)}...</Text>
           </View>
-        )}
+        </View>
 
-        {/* Purchases */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Purchases</Text>
+        {/* Subscription Management */}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Subscription</Text>
           
           <TouchableOpacity 
-            style={styles.restoreButton}
-            onPress={restorePurchases}
+            style={dynamicStyles.primaryButton}
+            onPress={simulateManageSubscriptions}
             disabled={loading}
           >
-            <Text style={styles.restoreButtonText}>
-              🔄 Restore Purchases
+            <Text style={dynamicStyles.primaryButtonText}>
+              ⚙️ Manage Subscription
             </Text>
           </TouchableOpacity>
-          
-          <Text style={styles.restoreDescription}>
-            If you've previously purchased Pro on this device, tap here to restore your subscription.
-          </Text>
         </View>
 
-        {/* App Info */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Information</Text>
-          <Text style={styles.appInfo}>Thrifter's Eye v1.0</Text>
-          <Text style={styles.appInfo}>AI-powered item identification</Text>
+        {/* App Information */}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>App Information</Text>
+          <Text style={dynamicStyles.appInfo}>Thrifter's Eye v1.0</Text>
+          <Text style={dynamicStyles.appInfo}>AI-powered item identification & valuation</Text>
+          <Text style={dynamicStyles.appInfo}>Theme: {isDark ? 'Dark Mode' : 'Light Mode'}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
