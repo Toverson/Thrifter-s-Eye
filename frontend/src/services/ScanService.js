@@ -161,6 +161,8 @@ export class ScanService {
       console.error('❌ ScanService: Error getting scan by ID from backend API:', error);
       return null;
     }
+  }
+
   static async clearUserHistory() {
     try {
       const user = auth.currentUser;
