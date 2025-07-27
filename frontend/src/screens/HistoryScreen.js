@@ -151,22 +151,34 @@ export default function HistoryScreen() {
           
           <button
             onClick={async () => {
-              if (!window.confirm('Are you sure you want to clear all scan history? This action cannot be undone.')) {
+              console.log('🔄 Clear History button clicked');
+              
+              const confirmed = window.confirm('Are you sure you want to clear all scan history? This action cannot be undone.');
+              console.log('🔄 User confirmation:', confirmed);
+              
+              if (!confirmed) {
+                console.log('❌ User cancelled confirmation dialog');
                 return;
               }
               
               try {
-                console.log('🗑️ Clearing scan history...');
+                console.log('🗑️ Starting scan history clearing process...');
                 const result = await ScanService.clearUserHistory();
-                console.log('✅ Scan history cleared:', result);
+                console.log('✅ Scan history cleared successfully:', result);
                 
                 // Show success message
-                alert(`Successfully cleared ${result.deleted_count} scans from your history.`);
+                const message = `Successfully cleared ${result.deleted_count} scans from your history.`;
+                console.log('✅ Showing success message:', message);
+                alert(message);
                 
                 // Reload the history to show empty state
+                console.log('🔄 Reloading scan history...');
                 await loadScans();
+                console.log('✅ Scan history reloaded');
               } catch (error) {
-                console.error('❌ Failed to clear history:', error);
+                console.error('❌ Failed to clear history - Full error details:', error);
+                console.error('❌ Error message:', error.message);
+                console.error('❌ Error stack:', error.stack);
                 alert('Failed to clear scan history. Please try again.');
               }
             }}
