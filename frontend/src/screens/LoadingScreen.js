@@ -59,7 +59,8 @@ export default function LoadingScreen() {
       const result = await CloudFunctionService.scanItem(
         imageBase64,
         userLocation?.countryCode || 'US',
-        userLocation?.currencyCode || 'USD'
+        userLocation?.currencyCode || 'USD',
+        user.uid  // Pass the user ID for privacy compliance
       );
       console.log('✅ LoadingScreen: CloudFunctionService completed');
 
