@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { UserService } from '../services/UserService';
+import { LocationService } from '../services/LocationService';
+import { CurrencyService } from '../services/CurrencyService';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function PaywallScreen() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const [pricing, setPricing] = useState({
+    formatted: '$9.59', // Fallback price
+    originalCAD: '$12.99',
+    currencyCode: 'USD'
+  });
+  const [loading, setLoading] = useState(true);
 
   const simulateProUpgrade = async () => {
     try {
