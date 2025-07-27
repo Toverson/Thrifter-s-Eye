@@ -13,6 +13,7 @@ import { LocationService } from '../services/LocationService';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function HomeScreen({ navigation }) {
+  const { theme } = useTheme();
   const [userData, setUserData] = useState(null);
   const [location, setLocation] = useState(null);
 
