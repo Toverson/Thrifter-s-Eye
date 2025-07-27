@@ -333,12 +333,17 @@ async def get_scan_history(user_id: Optional[str] = None):
         raise HTTPException(status_code=500, detail=f"Failed to get history: {str(e)}")
 
 @api_router.get("/scan/{scan_id}", response_model=ScanResult)
-async def get_scan_result(scan_id: str):
-    """Get specific scan result"""
+async def get_scan_result(scan_id: str, user_id: Optional[str] = None):
+    """Get specific scan result - with user ownership check"""
     try:
         scan = await db.scans.find_one({"id": scan_id})
         if not scan:
             raise HTTPException(status_code=404, detail="Scan not found")
+        
+        # Optional: Check if user owns this scan
+        if user_id and scan.get("user_id") != user_id:
+            raise HTTPException(status_code=403, detail="Access denied - scan belongs to another user")
+        
         return ScanResult(**scan)
     except HTTPException:
         raise
