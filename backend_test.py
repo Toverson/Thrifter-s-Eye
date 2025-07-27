@@ -428,7 +428,7 @@ Similar Listings Count: {len(data.get('similar_listings', []))}
             # Step 2: Immediately retrieve history to verify scan is there
             print("📥 Step 2: Retrieving history to verify scan was saved...")
             
-            history_response = requests.get(f"{API_BASE}/history", timeout=10)
+            history_response = requests.get(f"{API_BASE}/history?user_id=backend_test_cycle_user", timeout=10)
             
             if history_response.status_code != 200:
                 self.log_test("scan_save_retrieve", "fail", 
