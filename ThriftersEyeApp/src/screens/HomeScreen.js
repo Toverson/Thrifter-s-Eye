@@ -10,6 +10,7 @@ import {
 import auth from '@react-native-firebase/auth';
 import { UserService } from '../services/UserService';
 import { LocationService } from '../services/LocationService';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function HomeScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
