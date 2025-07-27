@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, linkWithCredential, EmailAuthProvider } from 'firebase/auth';
-import { auth, googleProvider } from '../firebase';
-import { UserService } from '../services/UserService';
+import { auth } from '../firebase';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function SettingsScreen() {
@@ -10,44 +8,6 @@ export default function SettingsScreen() {
   const { theme, toggleTheme, isDark } = useTheme();
   const [loading, setLoading] = useState(false);
   const [user] = useState(auth.currentUser);
-
-  const linkWithEmailPassword = async () => {
-    const email = prompt('Enter your email:');
-    if (!email) return;
-
-    const password = prompt('Enter a password:');
-    if (!password) return;
-
-    try {
-      setLoading(true);
-      const credential = EmailAuthProvider.credential(email, password);
-      await linkWithCredential(user, credential);
-      alert('Account linked successfully! Your anonymous account has been upgraded to a permanent account.');
-    } catch (error) {
-      console.error('Account linking error:', error);
-      alert('Failed to link account. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const linkWithGoogle = async () => {
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const credential = result.credential;
-      
-      if (credential) {
-        await linkWithCredential(user, credential);
-        alert('Google account linked successfully! Your anonymous account has been upgraded.');
-      }
-    } catch (error) {
-      console.error('Google linking error:', error);
-      alert('Failed to link Google account. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const simulateManageSubscriptions = () => {
     // In the iOS app, this would call: Purchases.showManageSubscriptions()
