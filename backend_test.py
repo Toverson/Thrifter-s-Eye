@@ -1298,6 +1298,13 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         else:
             self.log_test("individual_scan", "skip", "Skipped due to scan endpoint failure")
         
+        # Test 8: CRITICAL - DELETE /api/history endpoint (Clear History functionality)
+        delete_history_ok = False
+        if health_ok:
+            delete_history_ok = self.test_delete_history_endpoint()
+        else:
+            self.log_test("delete_history", "skip", "Skipped due to health check failure")
+        
         # Final Summary
         self.print_final_summary()
         
