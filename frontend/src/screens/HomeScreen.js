@@ -155,6 +155,30 @@ export default function HomeScreen() {
                 <strong>Session Time:</strong> {new Date().toLocaleTimeString()}
               </p>
             </div>
+            
+            {/* User isolation testing button */}
+            <button
+              onClick={async () => {
+                try {
+                  // Sign out current user
+                  await signOut(auth);
+                  console.log('🔄 Signed out current user');
+                  
+                  // Create new anonymous session
+                  const result = await signInAnonymously(auth);
+                  console.log('✅ Created new anonymous session:', result.user.uid);
+                  
+                  // Refresh page to update UI
+                  window.location.reload();
+                } catch (error) {
+                  console.error('❌ Error creating new session:', error);
+                  alert('Failed to create new session');
+                }
+              }}
+              className={`mt-4 w-full px-4 py-2 rounded-lg ${theme.colors.primary} text-white hover:opacity-90 transition-opacity`}
+            >
+              🔄 Create New Anonymous Session (Testing)
+            </button>
           </div>
         </div>
       </div>
