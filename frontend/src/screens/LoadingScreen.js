@@ -72,11 +72,18 @@ export default function LoadingScreen() {
       console.log('✅ LoadingScreen: Received scan result with ID:', result.id);
 
       // Increment user's scan count (for free users)
-      console.log('🔄 LoadingScreen: Getting user data');
+      console.log('🔄 LoadingScreen: Getting user data for scan count check');
       const userData = await UserService.getUserData(user.uid);
+      console.log('🔄 LoadingScreen: User data:', userData);
+      
       if (userData && !userData.isProSubscriber) {
-        console.log('🔄 LoadingScreen: Incrementing scan count');
+        console.log('🔄 LoadingScreen: User is not pro, incrementing scan count from', userData.scanCount, 'to', userData.scanCount + 1);
         await UserService.incrementScanCount(user.uid);
+        console.log('✅ LoadingScreen: Scan count incremented');
+      } else if (userData && userData.isProSubscriber) {
+        console.log('ℹ️ LoadingScreen: User is pro subscriber, not incrementing scan count');
+      } else {
+        console.log('⚠️ LoadingScreen: No user data found, not incrementing scan count');
       }
 
       // The scan is already saved by the backend API call
