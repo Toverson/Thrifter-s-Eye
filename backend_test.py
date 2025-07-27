@@ -200,14 +200,14 @@ This resolves the reported scanning failures after privacy fixes.
             return True
                 
         except requests.exceptions.Timeout:
-            self.log_test("scan_endpoint", "fail", 
+            self.log_test("scan_userid_validation", "fail", 
                         "Request timeout during userId validation tests")
             return False
         except requests.exceptions.RequestException as e:
-            self.log_test("scan_endpoint", "fail", f"Connection error: {str(e)}")
+            self.log_test("scan_userid_validation", "fail", f"Connection error: {str(e)}")
             return False
         except Exception as e:
-            self.log_test("scan_endpoint", "fail", f"Unexpected error: {str(e)}")
+            self.log_test("scan_userid_validation", "fail", f"Unexpected error: {str(e)}")
             return False
 
     def test_scan_endpoint(self):
