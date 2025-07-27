@@ -146,25 +146,12 @@ export default function SettingsScreen() {
           </button>
         </div>
 
-        {/* Web Testing Info */}
-        <div className={`${isDark ? 'bg-blue-900' : 'bg-blue-50'} ${isDark ? 'border-blue-700' : 'border-blue-200'} border rounded-lg p-6 mb-6`}>
-          <h2 className={`text-lg font-bold ${isDark ? 'text-blue-300' : 'text-blue-800'} mb-3`}>Web Testing Mode</h2>
-          <div className={`space-y-2 text-sm ${isDark ? 'text-blue-200' : 'text-blue-700'}`}>
-            <p>• Anonymous authentication is working correctly</p>
-            <p>• All Firestore operations use your anonymous user ID</p>
-            <p>• Account linking simulates the iOS app flow</p>
-            <p>• RevenueCat features are simulated for web testing</p>
-            <p>• Theme switching persists across sessions</p>
-          </div>
-        </div>
-
-        {/* App Info */}
+        {/* App Information */}
         <div className={`${theme.colors.surface} rounded-lg shadow-lg p-6 border ${theme.colors.border}`}>
           <h2 className={`text-xl font-bold ${theme.colors.text} mb-4`}>App Information</h2>
           <div className={`${theme.colors.textSecondary} space-y-1`}>
             <p>Thrifter's Eye v1.0</p>
-            <p>AI-powered item identification</p>
-            <p>Web testing version mirroring iOS app</p>
+            <p>AI-powered item identification & valuation</p>
             <p>Theme: {isDark ? 'Dark Mode' : 'Light Mode'}</p>
           </div>
         </div>
