@@ -599,9 +599,16 @@ Has AI Analysis: {'Yes' if data.get('ai_analysis') else 'No'}
         else:
             self.log_test("history_endpoint", "skip", "Skipped due to health check failure")
         
-        # Test 5: Individual Scan (only if scan was successful)
+        # Test 5: Scan Save & Retrieve Cycle (only if health check passes)
+        save_retrieve_ok = False
+        if health_ok:
+            save_retrieve_ok = self.test_scan_save_and_retrieve_cycle()
+        else:
+            self.log_test("scan_save_retrieve", "skip", "Skipped due to health check failure")
+        
+        # Test 6: Individual Scan (only if scan was successful)
         individual_ok = False
-        if scan_ok:
+        if scan_ok or save_retrieve_ok:  # Can use scan ID from either test
             individual_ok = self.test_individual_scan()
         else:
             self.log_test("individual_scan", "skip", "Skipped due to scan endpoint failure")
