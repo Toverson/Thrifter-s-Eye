@@ -259,6 +259,7 @@ async def scan_item(request: ScanRequest):
             country_code = getattr(request, 'countryCode', 'US')
             currency_code = getattr(request, 'currencyCode', 'USD')
             user_id = request.userId
+            description = getattr(request, 'description', '') or ''
             image_data = base64.b64decode(image_base64)
         else:
             # File upload format (legacy)
@@ -267,6 +268,7 @@ async def scan_item(request: ScanRequest):
             country_code = 'US'
             currency_code = 'USD'
             user_id = request.userId
+            description = ''
         
         logging.info(f"Processing scan for user: {user_id}")
         
