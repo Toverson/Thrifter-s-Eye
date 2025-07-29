@@ -52,7 +52,9 @@ export default function LoadingScreen({ navigation, route }) {
       const result = await CloudFunctionService.scanItem(
         imageBase64,
         location?.countryCode || 'US',
-        location?.currencyCode || 'USD'
+        location?.currencyCode || 'USD',
+        user.uid,  // User ID for privacy
+        description || ''  // Optional description
       );
 
       // Increment user's scan count (for free users)
