@@ -3,12 +3,13 @@ export class CloudFunctionService {
   // For web testing, we'll use the existing backend API
   static baseUrl = process.env.REACT_APP_BACKEND_URL;
 
-  static async scanItem(imageBase64, countryCode, currencyCode, userId) {
+  static async scanItem(imageBase64, countryCode, currencyCode, userId, description = '') {
     try {
       console.log('🚀 CloudFunction: Starting scan request');
       console.log('📍 CloudFunction: Base URL:', this.baseUrl);
       console.log('📍 CloudFunction: Country/Currency:', countryCode, currencyCode);
       console.log('📍 CloudFunction: User ID:', userId);
+      console.log('📝 CloudFunction: Description:', description || 'None provided');
       console.log('📍 CloudFunction: Image size:', Math.round(imageBase64.length / 1024), 'KB');
 
       if (!userId) {
