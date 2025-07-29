@@ -7,13 +7,20 @@ import {
   Alert,
   SafeAreaView,
   Image,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function CameraScreen({ navigation, route }) {
+  const { theme } = useTheme();
   const { location } = route.params || {};
   const [selectedImage, setSelectedImage] = useState(null);
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     requestPermissions();
