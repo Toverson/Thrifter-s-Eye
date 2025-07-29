@@ -64,6 +64,7 @@ class ScanRequest(BaseModel):
     countryCode: Optional[str] = "US"
     currencyCode: Optional[str] = "USD"
     userId: Optional[str] = None  # Firebase user ID
+    description: Optional[str] = ""  # Optional item description
 
 # Helper Functions
 async def analyze_image_with_vision(image_data: bytes) -> Dict[str, Any]:
