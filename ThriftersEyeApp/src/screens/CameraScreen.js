@@ -224,7 +224,8 @@ export default function CameraScreen({ navigation, route }) {
             </TouchableOpacity>
           )}
         </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
