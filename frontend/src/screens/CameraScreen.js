@@ -9,6 +9,7 @@ export default function CameraScreen() {
   const { location: userLocation } = location.state || {};
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [description, setDescription] = useState('');
   const fileInputRef = useRef(null);
 
   const compressImage = (file, maxWidth = 1024, quality = 0.8) => {
