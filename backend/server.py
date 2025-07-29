@@ -58,6 +58,7 @@ class ScanResult(BaseModel):
     search_response: Optional[Dict[str, Any]] = None
     country_code: Optional[str] = "US"
     currency_code: Optional[str] = "USD"
+    description: Optional[str] = ""  # Store user's description
 
 class ScanRequest(BaseModel):
     imageBase64: str
