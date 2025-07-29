@@ -158,7 +158,15 @@ async def analyze_with_gemini(vision_data: Dict[str, Any], search_data: Dict[str
         
         logging.info("Gemini chat instance created")
         
-        # Build prompt with location-aware context
+        # Build prompt with location-aware context and user description
+        description_section = ""
+        if description and description.strip():
+            description_section = f"""
+## 3. User Description:
+The user provided this description: "{description.strip()}"
+
+"""
+        
         prompt = f"""
 # CONTEXT
 You are "Thrifter's Eye," an expert AI appraiser specializing in items found at thrift stores, garage sales, and flea markets. You are analytical, realistic, and your goal is to help a user understand what they've found and what it might be worth in the {country_code} market (prices in {currency_code}).
@@ -175,13 +183,15 @@ Here is the data I have gathered:
 ## 2. Similar Listings Found on {country_code} Marketplaces:
 {json.dumps(search_data, indent=2)}
 
-# YOUR ANALYSIS & APPRAISAL
+{description_section}# YOUR ANALYSIS & APPRAISAL
 Based on ALL the data above, perform the following actions:
-1. Synthesize the Vision data and Search results to determine the most likely identity of the item.
+1. Synthesize the Vision data, Search results{', and User Description' if description else ''} to determine the most likely identity of the item.
 2. Analyze the prices of the similar listings, ignoring outliers, to establish a realistic resale value range in {currency_code}.
 3. Write a brief, helpful analysis for the user, considering the {country_code} market conditions.
 4. Generate a draft title and description for a marketplace listing suitable for the {country_code} market.
 5. Provide a confidence score from 0-100 representing your certainty in the valuation.
+
+{('IMPORTANT: The user provided a description. Use this information to guide your analysis and improve accuracy.' if description else '')}
 
 # REQUIRED OUTPUT FORMAT
 Your entire response must be a single, valid JSON object. Do not include any text or markdown before or after the JSON object.
