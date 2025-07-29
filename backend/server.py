@@ -271,6 +271,8 @@ async def scan_item(request: ScanRequest):
             description = ''
         
         logging.info(f"Processing scan for user: {user_id}")
+        if description:
+            logging.info(f"User provided description: {description}")
         
         # Step 1: Analyze with Vision API
         logging.info("Analyzing image with Vision API...")
@@ -280,9 +282,9 @@ async def scan_item(request: ScanRequest):
         logging.info("Searching marketplaces...")
         search_data = await search_marketplaces(vision_data, country_code)
         
-        # Step 3: Analyze with Gemini (update prompt for location-aware analysis)
+        # Step 3: Analyze with Gemini (include user description)
         logging.info("Analyzing with Gemini AI...")
-        ai_result = await analyze_with_gemini(vision_data, search_data, country_code, currency_code)
+        ai_result = await analyze_with_gemini(vision_data, search_data, country_code, currency_code, description)
         
         # Create scan result
         scan_result = ScanResult(
@@ -297,7 +299,8 @@ async def scan_item(request: ScanRequest):
             vision_response=vision_data,
             search_response=search_data.get("raw_response", {}),
             country_code=country_code,
-            currency_code=currency_code
+            currency_code=currency_code,
+            description=description  # Store the user's description
         )
         
         # Store in database
