@@ -103,6 +103,7 @@ export default function CameraScreen({ navigation, route }) {
       imageBase64: selectedImage.base64,
       imageUri: selectedImage.uri,
       location,
+      description: description.trim(), // Pass the description
     });
   };
 
