@@ -13,7 +13,7 @@ import { ScanService } from '../services/ScanService';
 import { UserService } from '../services/UserService';
 
 export default function LoadingScreen({ navigation, route }) {
-  const { imageBase64, imageUri, location } = route.params;
+  const { imageBase64, imageUri, location, description } = route.params;
   const [loadingMessage, setLoadingMessage] = useState('Identifying object...');
 
   const loadingMessages = [
