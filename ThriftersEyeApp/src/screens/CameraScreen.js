@@ -231,19 +231,6 @@ export default function CameraScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
   backButton: {
     padding: 5,
   },
@@ -252,53 +239,45 @@ const styles = StyleSheet.create({
     color: '#667eea',
     fontWeight: '600',
   },
-  title: {
+  keyboardContainer: {
     flex: 1,
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginRight: 50, // Compensate for back button
+  },
+  scrollContainer: {
+    flex: 1,
   },
   content: {
-    flex: 1,
-    paddingHorizontal: 20,
+    flexGrow: 1,
+    padding: 20,
   },
   imageContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 30,
   },
   selectedImage: {
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 250,
     borderRadius: 15,
-    marginBottom: 20,
-  },
-  retakeButton: {
-    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#667eea',
-  },
-  retakeButtonText: {
-    color: '#667eea',
-    fontSize: 16,
-    fontWeight: '600',
+    marginBottom: 15,
   },
   placeholderContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 30,
   },
   imagePlaceholder: {
+    width: 250,
+    height: 250,
+    backgroundColor: '#e5e5e5',
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#d0d0d0',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: 20,
   },
   placeholderText: {
     fontSize: 60,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   instructionText: {
     fontSize: 16,
@@ -306,12 +285,51 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
+  descriptionContainer: {
+    marginBottom: 30,
+    padding: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+  descriptionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  descriptionInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    minHeight: 80,
+    marginBottom: 8,
+  },
+  characterCountContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 8,
+  },
+  characterCount: {
+    fontSize: 12,
+  },
+  descriptionHint: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
   buttonContainer: {
-    paddingVertical: 30,
+    alignItems: 'center',
   },
   cameraButton: {
     backgroundColor: '#667eea',
-    paddingVertical: 18,
+    paddingHorizontal: 40,
+    paddingVertical: 20,
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: {
@@ -324,13 +342,25 @@ const styles = StyleSheet.create({
   },
   cameraButtonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
+  },
+  retakeButton: {
+    backgroundColor: '#6c757d',
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginBottom: 10,
+  },
+  retakeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   scanButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 18,
+    backgroundColor: '#28a745',
+    paddingHorizontal: 40,
+    paddingVertical: 20,
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: {
@@ -343,8 +373,7 @@ const styles = StyleSheet.create({
   },
   scanButtonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
