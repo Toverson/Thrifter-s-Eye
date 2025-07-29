@@ -143,7 +143,7 @@ async def search_marketplaces(vision_data: Dict[str, Any], country_code: str = "
         logging.error(f"Search API error: {e}")
         return {"query": "", "similar_listings": [], "raw_response": {}}
 
-async def analyze_with_gemini(vision_data: Dict[str, Any], search_data: Dict[str, Any], country_code: str = "US", currency_code: str = "USD") -> Dict[str, Any]:
+async def analyze_with_gemini(vision_data: Dict[str, Any], search_data: Dict[str, Any], country_code: str = "US", currency_code: str = "USD", description: str = "") -> Dict[str, Any]:
     """Analyze with Gemini AI for final appraisal"""
     try:
         logging.info(f"Starting Gemini analysis for {country_code}/{currency_code}")
