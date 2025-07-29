@@ -148,6 +148,27 @@ export default function CameraScreen() {
               </div>
             </div>
             
+            {/* Description input field */}
+            <div className="max-w-md mx-auto mb-6">
+              <label className={`block ${theme.colors.text} font-medium mb-2 text-left`}>
+                Description (optional)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="e.g., 'vintage leather jacket', 'ceramic vase with blue pattern', 'antique wooden chair'..."
+                maxLength={200}
+                rows={3}
+                className={`w-full px-4 py-3 rounded-lg ${theme.colors.surface} ${theme.colors.border} border-2 ${theme.colors.text} placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-colors resize-none`}
+              />
+              <div className={`text-right mt-1 ${theme.colors.textMuted} text-sm`}>
+                {description.length}/200
+              </div>
+              <p className={`${theme.colors.textSecondary} text-sm mt-2 text-left`}>
+                💡 Adding a description helps our AI provide more accurate pricing and better listing suggestions
+              </p>
+            </div>
+
             <button
               onClick={triggerFileInput}
               className={`${theme.colors.primary} ${theme.colors.primaryText} font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-colors`}
