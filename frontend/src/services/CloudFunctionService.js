@@ -36,6 +36,7 @@ export class CloudFunctionService {
           countryCode,
           currencyCode,
           userId,  // Include userId in the request
+          description: description || '',  // Include optional description
         }),
         signal: controller.signal, // Add abort signal
       });
