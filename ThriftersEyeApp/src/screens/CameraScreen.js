@@ -153,6 +153,32 @@ export default function CameraScreen({ navigation, route }) {
           </View>
         )}
 
+        {/* Description input field */}
+        <View style={[styles.descriptionContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Text style={[styles.descriptionLabel, { color: theme.colors.text }]}>
+            Description (optional)
+          </Text>
+          <TextInput
+            style={[styles.descriptionInput, { backgroundColor: theme.colors.backgroundSecondary, color: theme.colors.text, borderColor: theme.colors.border }]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="e.g., 'vintage leather jacket', 'ceramic vase with blue pattern', 'antique wooden chair'..."
+            placeholderTextColor={theme.colors.textMuted}
+            multiline
+            numberOfLines={3}
+            maxLength={200}
+            textAlignVertical="top"
+          />
+          <View style={styles.characterCountContainer}>
+            <Text style={[styles.characterCount, { color: theme.colors.textMuted }]}>
+              {description.length}/200
+            </Text>
+          </View>
+          <Text style={[styles.descriptionHint, { color: theme.colors.textSecondary }]}>
+            💡 Adding a description helps our AI provide more accurate pricing and better listing suggestions
+          </Text>
+        </View>
+
         <View style={styles.buttonContainer}>
           {!selectedImage ? (
             <TouchableOpacity 
