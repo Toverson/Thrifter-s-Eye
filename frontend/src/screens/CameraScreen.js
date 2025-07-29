@@ -82,6 +82,7 @@ export default function CameraScreen() {
         imageBase64: selectedImage,
         imagePreview,
         location: userLocation,
+        description: description.trim(), // Pass the description to the loading screen
       }
     });
   };
