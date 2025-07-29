@@ -74,6 +74,7 @@ export default function LoadingScreen() {
       console.log('📍 LoadingScreen: User ID:', user.uid);
       console.log('📍 LoadingScreen: User isAnonymous:', user.isAnonymous);
       console.log('📍 LoadingScreen: Location:', userLocation);
+      console.log('📝 LoadingScreen: Description:', description || 'None provided');
 
       // Call the cloud function to analyze the image
       console.log('🔄 LoadingScreen: Calling CloudFunctionService with userId:', user.uid);
@@ -82,7 +83,8 @@ export default function LoadingScreen() {
         imageBase64,
         userLocation?.countryCode || 'US',
         userLocation?.currencyCode || 'USD',
-        user.uid  // Pass the user ID for privacy compliance
+        user.uid,  // Pass the user ID for privacy compliance
+        description  // Pass the optional description to improve AI analysis
       );
       console.log('✅ LoadingScreen: CloudFunctionService completed');
       console.log('✅ LoadingScreen: Received scan result with ID:', result.id);
