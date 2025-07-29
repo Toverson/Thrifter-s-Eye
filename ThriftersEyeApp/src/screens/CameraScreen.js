@@ -119,19 +119,47 @@ export default function CameraScreen({ navigation, route }) {
     );
   };
 
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 15,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    title: {
+      flex: 1,
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginRight: 50,
+      color: theme.colors.text,
+    },
+  });
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={dynamicStyles.container}>
+      <View style={dynamicStyles.header}>
         <TouchableOpacity 
           style={styles.backButton} 
           onPress={() => navigation.goBack()}
         >
           <Text style={styles.backButtonText}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Scan Item</Text>
+        <Text style={dynamicStyles.title}>Scan Item</Text>
       </View>
 
-      <View style={styles.content}>
+      <KeyboardAvoidingView 
+        style={styles.keyboardContainer} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.content}>
         {selectedImage ? (
           <View style={styles.imageContainer}>
             <Image source={{ uri: selectedImage.uri }} style={styles.selectedImage} />
