@@ -91,11 +91,22 @@ const AppContent = () => {
           await UserService.createUserIfNotExists(user.uid, user.email || 'anonymous@thrifterseye.com');
           console.log('✅ User document created/verified');
           
+          // Check if user has agreed to terms
+          console.log('📋 Checking terms agreement status...');
+          const hasAgreedToTerms = await UserService.hasAgreedToTerms(user.uid);
+          console.log('📋 Terms agreement status:', hasAgreedToTerms);
+          
           if (mounted) {
             setUser(user);
             setError(null);
+            setNeedsTermsAgreement(!hasAgreedToTerms);
             setLoading(false);
-            setDebugInfo({ step: 'Authentication complete', userId: user.uid, timestamp: Date.now() });
+            setDebugInfo({ 
+              step: 'Authentication complete', 
+              userId: user.uid, 
+              needsTerms: !hasAgreedToTerms,
+              timestamp: Date.now() 
+            });
           }
         } catch (error) {
           console.error('❌ Error creating user document:', error);
