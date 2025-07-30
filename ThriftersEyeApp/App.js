@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
 import { LogBox, StatusBar } from 'react-native';
 import Purchases from 'react-native-purchases';
+import { REVENUECAT_PUBLIC_KEY_IOS } from '@env';
 
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
