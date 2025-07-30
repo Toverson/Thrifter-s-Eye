@@ -28,6 +28,7 @@ const Stack = createStackNavigator();
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
+  const [needsTermsAgreement, setNeedsTermsAgreement] = useState(false);
 
   // Handle user state changes
   function onAuthStateChanged(user) {
