@@ -292,9 +292,14 @@ const AppContent = () => {
     );
   }
 
+  const handleTermsAgreementComplete = () => {
+    console.log('✅ Terms agreement completed');
+    setNeedsTermsAgreement(false);
+  };
+
   // Show terms agreement screen if user hasn't agreed yet
   if (user && needsTermsAgreement) {
-    return <TermsAgreementScreen />;
+    return <TermsAgreementScreen onAgreementComplete={handleTermsAgreementComplete} />;
   }
 
   return (
