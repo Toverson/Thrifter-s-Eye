@@ -63,7 +63,7 @@ export default function App() {
     try {
       // Configure RevenueCat
       Purchases.configure({
-        apiKey: 'appl_MMOvAgIufEcRcRFvFipcmykdqnA',
+        apiKey: REVENUECAT_PUBLIC_KEY_IOS,
       });
 
       // Log in the anonymous user to RevenueCat
