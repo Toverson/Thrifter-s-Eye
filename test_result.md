@@ -206,7 +206,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implement three key improvements: 1) Fix scan history not saving after anonymous auth implementation, 2) Add subscription management button calling RevenueCat's showManageSubscriptions(), 3) Implement dark/light mode toggle with ThemeContext API defaulting to dark mode."
+user_problem_statement: "Refactor API keys: Extract GOOGLE_VISION_API_KEY, CUSTOM_SEARCH_API_KEY, CUSTOM_SEARCH_ENGINE_ID, REVENUECAT_PUBLIC_KEY_IOS from codebase into .env files using react-native-dotenv. Update babel.config.js and create TypeScript declarations for @env module."
 
 backend:
   - task: "API Health Check - GET /api/"
