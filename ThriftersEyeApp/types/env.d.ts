@@ -1,4 +1,5 @@
 declare module '@env' {
+  export const REACT_APP_BACKEND_URL: string;
   export const REVENUECAT_PUBLIC_KEY_IOS: string;
   export const GOOGLE_VISION_API_KEY: string;
   export const CUSTOM_SEARCH_API_KEY: string;
