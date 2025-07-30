@@ -1,0 +1,12 @@
+# Firebase iOS Configuration
+#
+# IMPORTANT: You need to download your actual GoogleService-Info.plist file from:
+# Firebase Console > Project Settings > General > Your iOS App > Download Config File
+#
+# 1. Download GoogleService-Info.plist from Firebase Console
+# 2. Add it to this directory: /app/ThriftersEyeApp/ios/GoogleService-Info.plist
+# 3. Add the file to your Xcode project (drag & drop into Xcode)
+#
+# DO NOT commit the actual GoogleService-Info.plist file to Git!
+#
+# This placeholder file is here to document the required location.
