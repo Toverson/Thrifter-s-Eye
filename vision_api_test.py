@@ -146,10 +146,12 @@ def test_vision_api_credentials():
     print("\n🔍 Testing Google Cloud Vision API Credentials")
     print("="*60)
     
-    # Check if credentials file exists
-    creds_path = "/app/backend/gen-lang-client-0045692674-0e08eb99ab10.json"
+    # Check if credentials file exists (update path to your actual service account key)
+    creds_path = "/app/backend/your-service-account-key.json"  # Update this path
     if not os.path.exists(creds_path):
         print("❌ Google Cloud credentials file not found")
+        print("ℹ️  Please add your service account key JSON file to /app/backend/")
+        print("ℹ️  See ENVIRONMENT_SETUP.md for instructions")
         return False
     
     try:
