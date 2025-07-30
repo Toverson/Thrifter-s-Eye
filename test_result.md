@@ -269,11 +269,14 @@ backend:
     file: "/app/ThriftersEyeApp/src/services/CloudFunctionService.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "✅ Successfully refactored CloudFunctionService.js to use REACT_APP_BACKEND_URL from @env instead of hardcoded 'https://your-backend-url.com'. Added import statement for environment variable."
+      - working: true
+        agent: "testing"
+        comment: "✅ Backend URL refactoring successful. Backend server running correctly on localhost:8001 with all API endpoints functional. Health check, scan, history, and delete endpoints all working properly."
 
   - task: "Delete React web frontend as requested"
     implemented: true
