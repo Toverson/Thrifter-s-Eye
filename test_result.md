@@ -296,15 +296,15 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "3.0"
-  test_sequence: 3
+  version: "4.0"
+  test_sequence: 4
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Theme System - TEST (verify toggle and persistence)"
-    - "Settings Screen - Subscription Management (verify button functionality)" 
-    - "Complete end-to-end testing of scanning flow (camera → analysis → results → history)"
+    - "Test react-native-dotenv integration and environment variable loading"
+    - "Verify backend continues to work after API key refactoring"
+    - "Test RevenueCat API key is properly loaded from environment"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
