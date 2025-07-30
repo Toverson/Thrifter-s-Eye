@@ -292,6 +292,11 @@ const AppContent = () => {
     );
   }
 
+  // Show terms agreement screen if user hasn't agreed yet
+  if (user && needsTermsAgreement) {
+    return <TermsAgreementScreen />;
+  }
+
   return (
     <Router>
       <Routes>
