@@ -31,6 +31,30 @@ dist/
 dist
 
 # Environment files (comprehensive coverage)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*
+
+# === CRITICAL: API KEYS & SECRETS ===
+# Google Service Account Keys (this is likely the blocked file)
+gen-lang-client-*.json
+*service-account*.json
+*ServiceAccount*.json
+GoogleService-Info.plist
+
+# Firebase sensitive configs
+.firebaserc
+firebase-debug.log
+.firebase/
+
+# Any JSON files with credentials
+*credentials*.json
+*config*.json
+*key*.json
+*secret*.json
 
 *token.json*
 *credentials.json*
