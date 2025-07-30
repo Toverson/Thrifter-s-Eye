@@ -282,98 +282,17 @@ backend:
         comment: "✅ Successfully deleted /app/frontend directory as requested by user. Focus is now solely on React Native app."
 
 frontend:
-  - task: "Firebase Anonymous Authentication"
+  - task: "API Key Refactoring Completed"
     implemented: true
-    working: false
-    file: "/app/frontend/src/App.js"
-    stuck_count: 4
+    working: true
+    file: "/app/ThriftersEyeApp"
+    stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
-      - working: false
-        agent: "user"
-        comment: "❌ User reported: App stuck on 'Loading your account...' screen despite Anonymous sign-in being enabled in Firebase Console"
-      - working: false
-        agent: "main"
-        comment: "❌ Identified root cause: auth/requests-to-this-api-identitytoolkit-method-google.cloud.identitytoolkit.v1.authenticationservice.signup-are-blocked error. Three issues found: 1) Project ID mismatch (thrifters-eye-app vs gen-lang-client-0045692674), 2) API key restricted to Generative Language API only, 3) Missing web app registration"
       - working: true
         agent: "main"
-        comment: "✅ FIXED: Updated Firebase configuration with correct project ID (gen-lang-client-0045692674), user removed API key restrictions, registered new web app in Firebase Console, created Firestore database with (default) ID. Anonymous authentication now working perfectly - users successfully sign in and user documents are created in Firestore. Home screen now displays correctly with 'Anonymous Session Active' status, scan count, and functional buttons."
-      - working: false
-        agent: "main"
-        comment: "❌ REGRESSION: After implementing theme system changes, anonymous authentication is failing again. Console shows 'Authentication was attempted but no user found' - auth state changes to 'No user' after anonymous sign-in attempt. Need to investigate if theme provider or routing changes affected auth flow."
-      - working: false
-        agent: "main"
-        comment: "❌ CONFIRMED REGRESSION: Application showing 'Authentication Required - Unable to create anonymous session' screen. Frontend logs show no JavaScript errors, confirming this is likely another Firebase configuration issue. Authentication blocking prevents access to all app functionality including scan history. This is now the critical blocker preventing scan history debugging."
-
-  - task: "Theme System - Dark/Light Mode Toggle"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/contexts/ThemeContext.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: true
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "✅ IMPLEMENTED: Created comprehensive theme system with ThemeContext API. Features: defaults to dark mode, theme toggle in Settings, localStorage persistence, comprehensive color scheme for both dark/light modes covering backgrounds, text, borders, buttons, cards, gradients. Updated App.js to wrap with ThemeProvider."
-
-  - task: "Settings Screen - Subscription Management"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/screens/SettingsScreen.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: true
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "✅ IMPLEMENTED: Added 'Manage Subscription' button that simulates RevenueCat's showManageSubscriptions() call for web testing. In iOS app, this will open device's Apple ID subscription management. Also added theme-aware styling throughout settings screen."
-
-  - task: "Scan History Functionality"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/services/ScanService.js"
-    stuck_count: 1
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: false
-        agent: "user"
-        comment: "❌ User reported: After implementing anonymous authentication, scan history is no longer being saved for any user. The previous global history is gone (which is good), but the new user-specific history is not being written to the database."
-      - working: false
-        agent: "main"
-        comment: "❌ DEBUGGING: Enhanced ScanService and HistoryScreen with comprehensive logging. Updated HistoryScreen to wait for authentication completion before loading scans. Added detailed error handling to identify if issue is with Firestore writes, security rules, or authentication timing. Currently investigating if scan saving is failing silently."
-      - working: false
-        agent: "main"
-        comment: "❌ INVESTIGATION: User confirmed that scans are being saved to database correctly. The issue is with the frontend HistoryScreen not displaying the saved scans. Authentication is failing (showing 'Authentication Required' screen) which prevents scan history from loading. Root cause appears to be authentication regression blocking the entire history display functionality."
-      - working: true
-        agent: "main"
-        comment: "✅ FIXED - ROOT CAUSE IDENTIFIED: The issue was an architectural mismatch - backend saves scans to MongoDB with hardcoded user_id 'prototype_user_01', while frontend was querying Firestore with Firebase Auth user IDs. Solution: Modified ScanService to use backend API endpoints (GET /api/history, POST /api/scan, GET /api/scan/{id}) instead of direct Firestore operations. History screen now displays all saved scans correctly with proper images, names, values, and timestamps. Results screen navigation also working properly."
-
-  - task: "Home Screen Theme Integration"
-    implemented: true
-    working: false
-    file: "/app/frontend/src/screens/HomeScreen.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: true
-    status_history:
-      - working: false
-        agent: "main"
-        comment: "❌ PARTIAL: Updated HomeScreen to use theme context and colors, but cannot verify full functionality due to authentication regression. Theme styling applied to gradient backgrounds, cards, text colors, and status displays."
-
-  - task: "Image Analysis Mobile Optimization"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/services/CloudFunctionService.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "✅ ENHANCED: Added mobile-specific optimizations: 45-second timeout with AbortController, image compression (max 1024px, 80% quality), detailed error handling with specific timeout/network messages, comprehensive logging throughout request flow. Should resolve mobile scanning timeout issues."
+        comment: "✅ Successfully refactored all hardcoded API keys to use react-native-dotenv. Configured babel.config.js, created TypeScript declarations, and externalized: REVENUECAT_PUBLIC_KEY_IOS, REACT_APP_BACKEND_URL, and placeholders for Google API keys (these use Firebase Functions config)."
 
 metadata:
   created_by: "main_agent"
