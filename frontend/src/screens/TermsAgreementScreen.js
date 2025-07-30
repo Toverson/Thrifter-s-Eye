@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { UserService } from '../services/UserService';
 import { auth } from '../firebase';
 import { useTheme } from '../contexts/ThemeContext';
 
-export default function TermsAgreementScreen() {
-  const navigate = useNavigate();
+export default function TermsAgreementScreen({ onAgreementComplete }) {
   const { theme } = useTheme();
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
