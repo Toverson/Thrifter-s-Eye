@@ -83,4 +83,43 @@ export class UserService {
       return false;
     }
   }
+
+  static async hasAgreedToTerms(userId) {
+    try {
+      console.log('🔄 UserService: Checking terms agreement for user:', userId);
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const hasAgreed = userData.hasAgreedToTerms === true;
+        console.log('✅ UserService: User terms agreement status:', hasAgreed);
+        return hasAgreed;
+      }
+      
+      console.log('📝 UserService: User document not found, terms agreement required');
+      return false;
+    } catch (error) {
+      console.error('❌ UserService: Error checking terms agreement:', error);
+      return false;
+    }
+  }
+
+  static async recordTermsAgreement(userId) {
+    try {
+      console.log('📝 UserService: Recording terms agreement for user:', userId);
+      
+      const userRef = doc(db, 'users', userId);
+      await setDoc(userRef, {
+        hasAgreedToTerms: true,
+        termsAgreementDate: new Date(),
+        termsVersion: '1.0', // Track version in case terms change later
+      }, { merge: true });
+      
+      console.log('✅ UserService: Terms agreement recorded successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ UserService: Error recording terms agreement:', error);
+      return false;
+    }
+  }
 }
