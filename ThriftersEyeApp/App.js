@@ -31,14 +31,28 @@ export default function App() {
   const [needsTermsAgreement, setNeedsTermsAgreement] = useState(false);
 
   // Handle user state changes
-  function onAuthStateChanged(user) {
+  async function onAuthStateChanged(user) {
     setUser(user);
     
     if (user) {
-      // Initialize RevenueCat with anonymous user ID
-      initializeRevenueCat(user.uid);
-      // Create user document if needed
-      UserService.createUserIfNotExists(user.uid, user.email || 'anonymous@thrifterseye.com');
+      try {
+        // Initialize RevenueCat with anonymous user ID
+        initializeRevenueCat(user.uid);
+        
+        // Create user document if needed
+        await UserService.createUserIfNotExists(user.uid, user.email || 'anonymous@thrifterseye.com');
+        
+        // Check if user has agreed to terms
+        console.log('📋 Checking terms agreement status for user:', user.uid);
+        const hasAgreedToTerms = await UserService.hasAgreedToTerms(user.uid);
+        console.log('📋 Terms agreement status:', hasAgreedToTerms);
+        
+        setNeedsTermsAgreement(!hasAgreedToTerms);
+      } catch (error) {
+        console.error('❌ Error during user initialization:', error);
+        // Set needs terms agreement to true as a safety measure
+        setNeedsTermsAgreement(true);
+      }
     }
     
     if (initializing) setInitializing(false);
