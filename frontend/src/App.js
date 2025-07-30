@@ -13,6 +13,7 @@ import ResultsScreen from './screens/ResultsScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import PaywallScreen from './screens/PaywallScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import TermsAgreementScreen from './screens/TermsAgreementScreen';
 
 import './App.css';
 
