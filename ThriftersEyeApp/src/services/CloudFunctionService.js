@@ -1,7 +1,9 @@
 // Cloud Function Service for calling the backend API
+import { REACT_APP_BACKEND_URL } from '@env';
+
 export class CloudFunctionService {
-  // This should be updated to match the backend URL for production
-  static baseUrl = 'https://your-backend-url.com'; // Update this in production
+  // Use environment variable for backend URL
+  static baseUrl = REACT_APP_BACKEND_URL;
 
   static async scanItem(imageBase64, countryCode, currencyCode, userId, description = '') {
     try {
