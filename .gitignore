@@ -101,6 +101,28 @@ agenthub/agents/youtube/db
 .cache/
 
 # Mobile development
-android-sdk/ frontend/node_modules/.cache/default-development/1.pack
+android-sdk/ 
+
+# Android/React Native
+**/android/app/build/
+**/android/build/
+**/android/.gradle/
+**/android/gradle/wrapper/gradle-wrapper.jar
+**/android/local.properties
+**/android/gradlew
+**/android/gradlew.bat
+
+# iOS/React Native  
+**/ios/build/
+**/ios/Pods/
+**/ios/*.xcworkspace/xcuserdata/
+**/ios/*.xcodeproj/xcuserdata/
+**/ios/.xcode.env.local
+
+# React Native
+metro.config.js.bak
+
+# Node modules cache
+frontend/node_modules/.cache/default-development/1.pack
 frontend/node_modules/.cache/default-development/1.pack
 frontend/node_modules/.cache/default-development/0.pack
