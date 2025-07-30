@@ -13,6 +13,7 @@ import ResultsScreen from './src/screens/ResultsScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import PaywallScreen from './src/screens/PaywallScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import TermsAgreementScreen from './src/screens/TermsAgreementScreen';
 
 // Services
 import { UserService } from './src/services/UserService';
