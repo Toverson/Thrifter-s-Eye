@@ -99,11 +99,18 @@ export default function App() {
     return null; // You could return a loading screen component here
   }
 
+  // Show terms agreement if user needs to accept terms
+  const showTermsFirst = user && needsTermsAgreement;
+
   return (
     <ThemeProvider>
       <NavigationContainer>
         <StatusBar barStyle="light-content" backgroundColor="#667eea" />
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator 
+          screenOptions={{ headerShown: false }}
+          initialRouteName={showTermsFirst ? "TermsAgreement" : "Home"}
+        >
+          <Stack.Screen name="TermsAgreement" component={TermsAgreementScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Camera" component={CameraScreen} />
           <Stack.Screen name="Loading" component={LoadingScreen} />
