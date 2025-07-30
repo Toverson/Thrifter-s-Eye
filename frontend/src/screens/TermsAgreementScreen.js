@@ -31,7 +31,7 @@ export default function TermsAgreementScreen({ onAgreementComplete }) {
       
       if (success) {
         console.log('✅ TermsAgreement: User agreed to terms, proceeding to app');
-        navigate('/');
+        onAgreementComplete();
       } else {
         alert('Failed to save your agreement. Please try again.');
       }
