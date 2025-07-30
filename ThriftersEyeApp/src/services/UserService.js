@@ -84,4 +84,42 @@ export class UserService {
       return false;
     }
   }
+
+  static async hasAgreedToTerms(userId) {
+    try {
+      console.log('🔄 UserService (RN): Checking terms agreement for user:', userId);
+      const userDoc = await firestore().collection('users').doc(userId).get();
+      
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        const hasAgreed = userData.hasAgreedToTerms === true;
+        console.log('✅ UserService (RN): User terms agreement status:', hasAgreed);
+        return hasAgreed;
+      }
+      
+      console.log('📝 UserService (RN): User document not found, terms agreement required');
+      return false;
+    } catch (error) {
+      console.error('❌ UserService (RN): Error checking terms agreement:', error);
+      return false;
+    }
+  }
+
+  static async recordTermsAgreement(userId) {
+    try {
+      console.log('📝 UserService (RN): Recording terms agreement for user:', userId);
+      
+      await firestore().collection('users').doc(userId).set({
+        hasAgreedToTerms: true,
+        termsAgreementDate: firestore.Timestamp.now(),
+        termsVersion: '1.0', // Track version in case terms change later
+      }, { merge: true });
+      
+      console.log('✅ UserService (RN): Terms agreement recorded successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ UserService (RN): Error recording terms agreement:', error);
+      return false;
+    }
+  }
 }
