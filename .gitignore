@@ -118,6 +118,7 @@ android-sdk/
 **/ios/*.xcworkspace/xcuserdata/
 **/ios/*.xcodeproj/xcuserdata/
 **/ios/.xcode.env.local
+**/ios/.xcode.env
 
 # React Native
 metro.config.js.bak
